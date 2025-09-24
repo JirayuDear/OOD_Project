@@ -83,13 +83,13 @@ class Hotel:
         self.__total_guests = 0
 
     def add_guests_channel(self, channel, count): ##เพิ่มแขกจากช่องทางเข้ามา พร้อมเลขห้อง##
-        channel = channel.lower()
-        for i in range(count):
+        for j in range(count):##วนรับแขกจากช่องทางนั้นๆ##
             self.__total_guests += 1
-            new_guest = Guest(channel, i+1, self.__total_guests)
+            room_number = self.__total_guests
+            new_guest = Guest(channel, j + 1, room_number)
             self.__root = self.__tree.insert(self.__root, new_guest)
 
-        print(f"Added {count} guests from channel {channel}.")
+        print(f"Added {count} guests from channel {channel}.\n")
     
     def show_all_guests(self): ##อันนี้แสดงแขกทั้งหมด สร้างไว้ test code ว่าทำงานถูกมั้ย##
         guests = self.__tree.inOrder(self.__root)
@@ -118,12 +118,16 @@ def menu():
         choice = input("Choose an option: ")
 
         if choice == "1":
-            channel = input("Enter channel name: ").lower()
             try:
-                count = int(input("Enter number of guests: "))
-                hotel.add_guests_channel(channel, count)
+                count_channels = int(input("Enter number of channels: "))
             except ValueError:
-                print("Invalid number!")
+                print("Invalid number, try again.")
+                continue
+            
+            for _ in range(count_channels): ##วนรับช่องทางเข้ามาหลายช่องทาง##
+                channel = input("Enter channel name: ").lower()
+                count = int(input(f"Enter number of guests from channel {channel}: "))
+                hotel.add_guests_channel(channel, count)
 
         elif choice == "0": ##เอาไว้โชว์ผลก่อน เทสๆ##
             hotel.show_all_guests()
