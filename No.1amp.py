@@ -98,8 +98,7 @@ class Hotel:
 
     def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
         return self.__total_guests
-
-##test##
+    
 def menu():
     hotel = Hotel()
 
@@ -112,7 +111,7 @@ def menu():
         print("5. Delete Room Manual (ฟังก์ชัน 5)")
         print("6. Sort Rooms (ฟังก์ชัน 6)")
         print("7. Search Room (ฟังก์ชัน 7)")
-        print("0. Exit")
+        print("0. Exit") 
         print("===================================\n")
 
         choice = input("Choose an option: ")
@@ -128,6 +127,24 @@ def menu():
                 channel = input("Enter channel name: ").lower()
                 count = int(input(f"Enter number of guests from channel {channel}: "))
                 hotel.add_guests_channel(channel, count)
+
+        elif choice == "2":
+            pass
+
+        elif choice == "3":
+            pass
+
+        elif choice == "4":
+            pass
+
+        elif choice == "5":
+            pass
+
+        elif choice == "6":
+            pass
+
+        elif choice == "7":
+            pass
 
         elif choice == "0": ##เอาไว้โชว์ผลก่อน เทสๆ##
             hotel.show_all_guests()

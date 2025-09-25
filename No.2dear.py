@@ -1,8 +1,8 @@
 class Guest: ##เก็บข้อมูลช่องทางเข้ามา ลำดับแขก(เอาไว้ดูกรณีมาหลายคนเฉยๆ) แล้วก็เลขห้องนะ##
     def __init__(self, channel, order, room):
-        self.channel = channel #ช่องทางที่เดินทางเข้ามา
+        self.channel = channel
         self.order = order
-        self.room = room #เลขห้อง
+        self.room = room
 
     def __repr__(self):
         return f"Guest(channel={self.channel}, order={self.order}, room={self.room})"
@@ -80,23 +80,27 @@ class Hotel:
     def __init__(self):
         self.__root = None
         self.__tree = AVLTree()
-        self.__total_guests = 0
+        self.channel_map = {}
+        self.room_map = {}
 
-    def add_guests_channel(self, channel, count): ##เพิ่มแขกจากช่องทางเข้ามา พร้อมเลขห้อง##
-        channel = channel.lower()
-        print(self.__root)
-        for i in range(count):
-            new_guest = Guest(channel, i+1, self.__total_guests)
-            self.__total_guests += 1
+    def add_guests_channel(self, channel, count): 
+        guest_list = []
+        for j in range(count):
+            room_number = self.get_total_guests()
+            new_guest = Guest(channel, j, room_number)
+
             self.__root = self.__tree.insert(self.__root, new_guest)
 
-        print(f"Added {count} guests from channel {channel}.")
+            # เก็บใน hash เพื่อ lookup O(1)
+            self.room_map[room_number] = new_guest
+            guest_list.append(new_guest)
+            self.temp_room = j
+        # อัปเดต channel map
+        if channel not in self.channel_map:
+            self.channel_map[channel] = []
+        self.channel_map[channel].extend(guest_list)
 
-    def assign_guest_room(self):
-        pass
-
-    def allocate_room(self):
-        pass
+        print(f"Added {count} guests from channel {channel}.\n")
     
     def show_all_guests(self): ##อันนี้แสดงแขกทั้งหมด สร้างไว้ test code ว่าทำงานถูกมั้ย##
         guests = self.__tree.inOrder(self.__root)
@@ -104,41 +108,41 @@ class Hotel:
             print(guest)
 
     def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
-        return self.__total_guests
-
-##test##
+        return len(self.room_map)
+    
 def menu():
     hotel = Hotel()
 
     while True:
         print("\n====== Hilbert's Hotel Menu ======")
         print("1. Add Guests (ฟังก์ชัน 1)")
-        print("2. Assign Room Numbers (ฟังก์ชัน 2)")
-        print("3. Add More Guests (ฟังก์ชัน 3)")
-        print("4. Add Room Manual (ฟังก์ชัน 4)")
-        print("5. Delete Room Manual (ฟังก์ชัน 5)")
-        print("6. Sort Rooms (ฟังก์ชัน 6)")
-        print("7. Search Room (ฟังก์ชัน 7)")
-        print("0. Exit")
+        print("2. Add More Guests (ฟังก์ชัน 2)")
+        print("3. Add Room Manual (ฟังก์ชัน 3)")
+        print("4. Delete Room Manual (ฟังก์ชัน 4)")
+        print("5. Sort Rooms (ฟังก์ชัน 5)")
+        print("6. Search Room (ฟังก์ชัน 6)")
+        print("0. Exit") 
         print("===================================\n")
 
         choice = input("Choose an option: ")
 
         if choice == "1":
-            channel = input("Enter channel name: ").lower()
             try:
-                count = int(input("Enter number of guests: "))
-                hotel.add_guests_channel(channel, count)
+                count_channels = int(input("Enter number of channels: "))
             except ValueError:
-                print("Invalid number!")
+                print("Invalid number, try again.")
+                continue
+            
+            for _ in range(count_channels): ##วนรับช่องทางเข้ามาหลายช่องทาง##
+                channel = input("Enter channel name: ").lower()
+                count = int(input(f"Enter number of guests from channel {channel}: "))
+                hotel.add_guests_channel(channel, count)
 
         elif choice == "2":
-            channel = input("Enter channel name: ").lower()
-            try:
-                count = int(input("Enter number of guests: "))
-                hotel.add_guests_channel(channel, count)
-            except ValueError:
-                print("Invalid number!")
+            pass
+
+        elif choice == "3":
+            pass
 
         elif choice == "4":
             pass
@@ -149,15 +153,10 @@ def menu():
         elif choice == "6":
             pass
 
-        elif choice == "7":
-            pass
-
-
         elif choice == "0": ##เอาไว้โชว์ผลก่อน เทสๆ##
             hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
             print("Exiting program...")
-            break
 
         else:
             print("Invalid choice, try again.")
