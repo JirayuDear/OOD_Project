@@ -85,20 +85,21 @@ class Hotel:
 
     def add_guests_channel(self, channel, count): 
         guest_list = []
-        for j in range(count):
-            room_number = self.get_total_guests()
-            new_guest = Guest(channel, j, room_number)
+        if not self.__tree:
+            for j in range(count):
+                room_number = self.get_total_guests()
+                new_guest = Guest(channel, j, room_number)
 
-            self.__root = self.__tree.insert(self.__root, new_guest)
+                self.__root = self.__tree.insert(self.__root, new_guest)
 
             # เก็บใน hash เพื่อ lookup O(1)
-            self.room_map[room_number] = new_guest
-            guest_list.append(new_guest)
-            self.temp_room = j
+                self.room_map[room_number] = new_guest
+                guest_list.append(new_guest)
+                self.temp_room = j
         # อัปเดต channel map
-        if channel not in self.channel_map:
-            self.channel_map[channel] = []
-        self.channel_map[channel].extend(guest_list)
+            if channel not in self.channel_map:
+                self.channel_map[channel] = []
+            self.channel_map[channel].extend(guest_list)
 
         print(f"Added {count} guests from channel {channel}.\n")
     
