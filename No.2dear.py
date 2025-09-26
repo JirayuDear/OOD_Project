@@ -85,13 +85,29 @@ class Hotel:
 
     def add_guests_info(self, list_channel):
         guest_list = []
-        if len(list_channel) >=1:
+        if len(list_channel) >1:
             for item in list_channel:
                 channel = item[0]
                 count = item[1]
                 for guest_num in range(count):
                     room_number = (2**guest_num)*(3**int(channel[-1]))
-                    new_guest = Guest(channel, j, room_number)
+                    new_guest = Guest(channel, guest_num, room_number)
+                    self.__root = self.__tree.insert(self.__root, new_guest)
+
+            # เก็บ hash
+                    self.room_map[room_number] = new_guest
+                    guest_list.append(new_guest)
+                if channel not in self.channel_map:
+                    self.channel_map[channel] = []
+                self.channel_map[channel].extend(guest_list)
+
+                print(f"Added {count} guests from channel {channel}.\n")
+        else:
+                channel = list_channel[0][0]
+                count = list_channel[1][1]
+                for guest_num in range(count):
+                    room_number = self.get_total_guests()
+                    new_guest = Guest(channel, guest_num, room_number)
                     self.__root = self.__tree.insert(self.__root, new_guest)
 
             # เก็บ hash
@@ -103,7 +119,6 @@ class Hotel:
                 self.channel_map[channel].extend(guest_list)
 
                 print(f"Added {count} guests from channel {channel}.\n")
-
     def _is_prime(self, n: int) -> bool:
         if n < 2:
             return False
@@ -155,9 +170,8 @@ def menu():
             except ValueError:
                 print("Invalid number, try again.")
                 continue
-    
+            list_channel = []
             for i in range(count_channels): ##วนรับช่องทางเข้ามาหลายช่องทาง พร้อมกัน##
-                list_channel = []
                 channel = input("Enter channel name: ").lower()
                 channel = channel+'_'+str(i)
                 count = int(input(f"Enter number of guests from channel {channel}: "))
