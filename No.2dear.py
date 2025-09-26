@@ -83,26 +83,48 @@ class Hotel:
         self.channel_map = {}
         self.room_map = {}
 
-    def add_guests_channel(self, channel, count): 
+    def add_guests_info(self, list_channel):
         guest_list = []
-        if not self.__tree:
-            for j in range(count):
-                room_number = self.get_total_guests()
-                new_guest = Guest(channel, j, room_number)
+        if len(list_channel) >=1:
+            for item in list_channel:
+                channel = item[0]
+                count = item[1]
+                for guest_num in range(count):
+                    room_number = (2**guest_num)*(3**int(channel[-1]))
+                    new_guest = Guest(channel, j, room_number)
+                    self.__root = self.__tree.insert(self.__root, new_guest)
 
-                self.__root = self.__tree.insert(self.__root, new_guest)
+            # เก็บ hash
+                    self.room_map[room_number] = new_guest
+                    guest_list.append(new_guest)
 
-            # เก็บใน hash เพื่อ lookup O(1)
-                self.room_map[room_number] = new_guest
-                guest_list.append(new_guest)
-                self.temp_room = j
-        # อัปเดต channel map
-            if channel not in self.channel_map:
-                self.channel_map[channel] = []
-            self.channel_map[channel].extend(guest_list)
+                if channel not in self.channel_map:
+                    self.channel_map[channel] = []
+                self.channel_map[channel].extend(guest_list)
 
-        print(f"Added {count} guests from channel {channel}.\n")
-    
+                print(f"Added {count} guests from channel {channel}.\n")
+
+    def _is_prime(self, n: int) -> bool:
+        if n < 2:
+            return False
+        if n == 2 or n == 3:
+            return True
+        if n % 2 == 0:
+            return False
+        i = 3
+        while i * i <= n:
+            if n % i == 0:
+                return False
+            i += 2
+        return True
+
+    def generate_prime_number(self, start_num: int) -> int:
+        candidate = start_num + 1
+        while True:
+            if self._is_prime(candidate):
+                return candidate
+            candidate += 1
+
     def show_all_guests(self): ##อันนี้แสดงแขกทั้งหมด สร้างไว้ test code ว่าทำงานถูกมั้ย##
         guests = self.__tree.inOrder(self.__root)
         for guest in guests:
@@ -133,11 +155,16 @@ def menu():
             except ValueError:
                 print("Invalid number, try again.")
                 continue
-            
-            for _ in range(count_channels): ##วนรับช่องทางเข้ามาหลายช่องทาง##
+    
+            for i in range(count_channels): ##วนรับช่องทางเข้ามาหลายช่องทาง พร้อมกัน##
+                list_channel = []
                 channel = input("Enter channel name: ").lower()
+                channel = channel+'_'+str(i)
                 count = int(input(f"Enter number of guests from channel {channel}: "))
-                hotel.add_guests_channel(channel, count)
+                list_channel.append([channel, count])
+
+            for item in list_channel:
+                hotel.add_guests_info(list_channel)
 
         elif choice == "2":
             pass
@@ -157,7 +184,10 @@ def menu():
         elif choice == "0": ##เอาไว้โชว์ผลก่อน เทสๆ##
             hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
+
+        elif choice == "00": ##เอาไว้โชว์ผลก่อน เทสๆ##
             print("Exiting program...")
+            break
 
         else:
             print("Invalid choice, try again.")
