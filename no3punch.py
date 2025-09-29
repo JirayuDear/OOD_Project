@@ -82,6 +82,12 @@ class AVLTree: ##อันนี้แชทแนะนำมาเอาไว
         self.inOrder(root.right,listkeep)
         
         return listkeep
+    
+    def printTree(self, node, level=0):
+        if node is not None:
+            self.printTree(node.right, level + 1)
+            print('     ' * level, node.guest)
+            self.printTree(node.left, level + 1)
 
 class Hotel:
     def __init__(self):
@@ -89,29 +95,73 @@ class Hotel:
         self.__tree = AVLTree()
         self.channel_map = {}
         self.room_map = {}
+        self.last_barge_id = 0
 
-    def add_guests_channel(self, channel, count): 
-        guest_list = []
-        for j in range(count):
-            room_number = self.get_total_guests()
-            new_guest = Guest(channel, j, room_number)
-
-            self.__root = self.__tree.insert(self.__root, new_guest)
-
-            # เก็บใน hash เพื่อ lookup O(1)
-            self.room_map[room_number] = new_guest
-            guest_list.append(new_guest)
-            self.temp_room = j
-        # อัปเดต channel map
-        if channel not in self.channel_map:
-            self.channel_map[channel] = []
-        self.channel_map[channel].extend(guest_list)
-
-        print(f"Added {count} guests from channel {channel}.\n")
+    @property
+    def get_tree(self):
+        return self.__tree
     
-    def show_all_guests(self): 
-        listsort = self.__tree.inOrder(self.__root)
-        for guest in listsort:
+    @property
+    def get_root(self):
+        return self.__root
+
+    def add_guests_info(self, list_channel):
+        for item in list_channel:
+            barge_id = item["barge"]
+            self.last_barge_id = barge_id + 1  
+
+            for cars_id, count in item["cars"].items():
+                channel = f"barge{barge_id}_car{cars_id}"  
+                guest_list = []
+
+                for guest_num in range(count):
+                    room_number = (2**guest_num) * (3**cars_id) * (5**barge_id)
+                    new_guest = Guest(channel, guest_num, room_number)
+                    self.__root = self.__tree.insert(self.__root, new_guest)
+
+                    self.room_map[room_number] = new_guest
+                    guest_list.append(new_guest)
+
+
+                # if channel not in self.channel_map:
+                #     self.channel_map[channel] = []
+
+                #     # เพิ่มข้อมูลโครงสร้าง barge+cars
+                #     self.channel_map[channel].append({
+                #         "barge": barge_id,
+                #         "cars": {cars_id: count}
+                #     })
+
+                # self.channel_map[channel].extend(guest_list)
+
+                # print(f"Added {count} guests from channel {channel}.\n")
+
+
+    def _is_prime(self, n: int) -> bool:
+        if n < 2:
+            return False
+        if n == 2 or n == 3:
+            return True
+        if n % 2 == 0:
+            return False
+        i = 3
+        while i * i <= n:
+            if n % i == 0:
+                return False
+            i += 2
+        return True
+
+    def generate_prime_number(self, start_num: int) -> int:
+        candidate = start_num + 1
+        while True:
+            if self._is_prime(candidate):
+                return candidate
+            candidate += 1
+
+    def show_all_guests(self): ##อันนี้แสดงแขกทั้งหมด สร้างไว้ test code ว่าทำงานถูกมั้ย##
+        guests = self.__tree.inOrder(self.__root)
+        print(self.__tree.printTree(self.__root))
+        for guest in guests:
             print(guest)
 
     def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
@@ -119,6 +169,7 @@ class Hotel:
     
 def menu():
     hotel = Hotel()
+    avl = AVLTree()
 
     while True:
         print("\n====== Hilbert's Hotel Menu ======")
@@ -135,15 +186,21 @@ def menu():
 
         if choice == "1":
             try:
-                count_channels = int(input("Enter number of channels: "))
+                num_barges = int(input("Enter number of barges: "))
+                num_cars = int(input("Enter number of cars per barge: "))
+                num_people = int(input("Enter number of people per car: "))
             except ValueError:
                 print("Invalid number, try again.")
-                continue
-            
-            for _ in range(count_channels): ##วนรับช่องทางเข้ามาหลายช่องทาง##
-                channel = input("Enter channel name: ").lower()
-                count = int(input(f"Enter number of guests from channel {channel}: "))
-                hotel.add_guests_channel(channel, count)
+                num_barges = num_cars = num_people = 0
+
+            start_barge_id = hotel.last_barge_id if hotel.last_barge_id > 0 else 0
+
+            list_channel = [
+                {"barge": start_barge_id + b, "cars": {c: num_people for c in range(num_cars)}}
+                for b in range(num_barges)
+            ]
+
+            hotel.add_guests_info(list_channel)
 
         elif choice == "2":
             pass
@@ -157,13 +214,19 @@ def menu():
         elif choice == "5":
             print("\n=== Sorted Rooms ===")
             hotel.show_all_guests()
+            
 
         elif choice == "6":
             pass
 
         elif choice == "0": ##เอาไว้โชว์ผลก่อน เทสๆ##
+            
+            # avl.printTree(hotel.get_root)
             print("Total guests:", hotel.get_total_guests())
+
+        elif choice == "00": 
             print("Exiting program...")
+            break
 
         else:
             print("Invalid choice, try again.")
