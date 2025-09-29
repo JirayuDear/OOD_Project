@@ -96,6 +96,7 @@ class Hotel:
         self.channel_map = {}
         self.room_map = {}
         self.last_barge_id = 0
+        self.listsort = []
 
     @property
     def get_tree(self):
@@ -158,10 +159,14 @@ class Hotel:
                 return candidate
             candidate += 1
 
+    def sort(self):
+        self.listsort = self.__tree.inOrder(self.__root)
+        
+
     def show_all_guests(self): ##อันนี้แสดงแขกทั้งหมด สร้างไว้ test code ว่าทำงานถูกมั้ย##
-        guests = self.__tree.inOrder(self.__root)
-        print(self.__tree.printTree(self.__root))
-        for guest in guests:
+        #listsort = self.__tree.inOrder(self.__root)
+        #print(self.__tree.printTree(self.__root))
+        for guest in self.listsort:
             print(guest)
 
     def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
@@ -212,8 +217,8 @@ def menu():
             pass
 
         elif choice == "5":
-            print("\n=== Sorted Rooms ===")
-            hotel.show_all_guests()
+            print("\n===Already Sorted Rooms ===")
+            hotel.sort()
             
 
         elif choice == "6":
@@ -222,6 +227,7 @@ def menu():
         elif choice == "0": ##เอาไว้โชว์ผลก่อน เทสๆ##
             
             # avl.printTree(hotel.get_root)
+            hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
 
         elif choice == "00": 
