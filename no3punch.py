@@ -83,58 +83,11 @@ class AVLTree: ##อันนี้แชทแนะนำมาเอาไว
         
         return listkeep
     
-    def __getMinValueNode(self, node):
-        current = node
-        while current.left:
-            current = current.left
-        return current
-    def delete(self, root, room_number):
-        if not root:
-            return root
-        
-
-        if room_number < root.guest.room:
-            root.left = self.delete(root.left, room_number)
-        elif room_number > root.guest.room:
-            root.right = self.delete(root.right, room_number)
-        else:
-
-            if not root.left:
-                return root.right
-            elif not root.right:
-                return root.left
-            
-
-            temp = self.__getMinValueNode(root.right)
-            root.guest = temp.guest
-            root.right = self.delete(root.right, temp.guest.room)
-        
-
-        root.height = 1 + max(self.__getHight(root.left), self.__getHight(root.right))
-
-        balance = self.__getBalance(root)
-
-    
-        if balance > 1 and self.__getBalance(root.left) >= 0:
-            return self.__rotateRight(root)
-        if balance > 1 and self.__getBalance(root.left) < 0:
-            root.left = self.__rotateLeft(root.left)
-            return self.__rotateRight(root)
-
-        if balance < -1 and self.__getBalance(root.right) <= 0:
-            return self.__rotateLeft(root)
-        if balance < -1 and self.__getBalance(root.right) > 0:
-            root.right = self.__rotateRight(root.right)
-            return self.__rotateLeft(root)
-
-        return root
-
     def printTree(self, node, level=0):
         if node is not None:
             self.printTree(node.right, level + 1)
             print('     ' * level, node.guest)
             self.printTree(node.left, level + 1)
-    
 
 class Hotel:
     def __init__(self):
@@ -144,7 +97,7 @@ class Hotel:
         self.room_map = {}
         self.last_barge_id = 0
         self.listsort = []
- 
+
     @property
     def get_tree(self):
         return self.__tree
@@ -152,7 +105,7 @@ class Hotel:
     @property
     def get_root(self):
         return self.__root
- 
+
     def add_guests_info(self, list_channel):
         for item in list_channel:
             barge_id = item["barge"]
@@ -216,78 +169,22 @@ class Hotel:
         for guest in self.listsort:
             print(guest)
 
-    def search_room(self, room_number):
-        guest = self.room_map.get(room_number, None)
-        if guest:
-            print(f"Found Guest: {guest}")
-            return guest
-        else:
-            print(f"Room {room_number} not found.")
-            return None
-
     def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
         return len(self.room_map)
-
-    def add_rooms_manual_custom(self, channel, room_numbers):
-        added_guests = []
-        for order, room_number in enumerate(room_numbers):
-
-            if room_number in self.room_map:
-                print(f"Room {room_number} already occupied!")
-                print(f"Please choose other room TT")
-                return None
-            new_guest = Guest(channel, order, room_number)
-            self.__root = self.__tree.insert(self.__root, new_guest)
-            self.room_map[room_number] = new_guest
-            added_guests.append(new_guest)
-
-        if added_guests:
-            print(f"Added {len(added_guests)} guests manually to channel '{channel}'")
-        return added_guests
     
-    def add_rooms_manual(self, channel, count):
-        added_guests = []
-        room = self.__tree.inOrder(self.__root)
-        last_room = room[-1]
-        last_room = last_room.room
-        for order in range(count):
-            room_number = last_room + order
-            if room_number in self.room_map:
-                print(f"Room {room_number} already occupied! Skipping...")
-                continue
-            new_guest = Guest(channel, order, room_number)
-            self.__root = self.__tree.insert(self.__root, new_guest)
-            self.room_map[room_number] = new_guest
-            added_guests.append(new_guest)
-
-        if added_guests:
-            print(f"Added {len(added_guests)} guests manually to channel '{channel}'")
-        return added_guests
-    
-    def delete_room_manual(self, room_number):
-        if room_number not in self.room_map:
-            print(f"Room {room_number} not found! can't delete")
-            return None
-        
-        guest = self.room_map[room_number]
-        self.__root = self.__tree.delete(self.__root, room_number)
-        del self.room_map[room_number]
-        print(f"Deleted Guest {guest}")
-        return guest
-
 def menu():
     hotel = Hotel()
     avl = AVLTree()
 
     while True:
         print("\n====== Hilbert's Hotel Menu ======")
-        print("1. Add Guests")
-        print("2. Add Room Manual")
-        print("3. Delete Room Manual")
-        print("4. Sort Rooms")
-        print("5. Search Room")
-        print("6. Show All Guests")
-        print("00. Exit")
+        print("1. Add Guests (ฟังก์ชัน 1)")
+        print("2. Add More Guests (ฟังก์ชัน 2)")
+        print("3. Add Room Manual (ฟังก์ชัน 3)")
+        print("4. Delete Room Manual (ฟังก์ชัน 4)")
+        print("5. Sort Rooms (ฟังก์ชัน 5)")
+        print("6. Search Room (ฟังก์ชัน 6)")
+        print("0. Exit") 
         print("===================================\n")
 
         choice = input("Choose an option: ")
@@ -311,45 +208,24 @@ def menu():
             hotel.add_guests_info(list_channel)
 
         elif choice == "2":
-            try:
-                channel = input("Enter channel name: ")
-                mode = input("Choose mode: (c) เอาห้องเรียงกันมั้ย or (l) เลือกห้องตามใจชอบ: ").lower()
-                
-                if mode == "c":
-                    count = int(input("Enter number of guests: "))
-                    hotel.add_rooms_manual(channel, count)
-                
-                elif mode == "l":
-                    rooms_str = input("Enter room numbers separated by commas: ")
-                    room_numbers = [int(x.strip()) for x in rooms_str.split(",")]
-                    hotel.add_rooms_manual_custom(channel, room_numbers)
-
-                else:
-                    print("Invalid mode!")
-
-            except ValueError:
-                print("Invalid input, try again.")
+            pass
 
         elif choice == "3":
-            try:
-                room_number = input("Choose room number to delete ")
-                hotel.delete_room_manual(room_number)
-            except ValueError:
-                print("Invalid input, try again.")
+            pass
 
         elif choice == "4":
+            pass
+
+        elif choice == "5":
             print("\n===Already Sorted Rooms ===")
             hotel.sort()
             
 
-        elif choice == "5":
-            try:
-                room_number = int(input("Enter room number to search: "))
-                hotel.search_room(room_number)
-            except ValueError:
-                print("Invalid room number!")
+        elif choice == "6":
+            pass
 
-        elif choice == "6": ##เอาไว้โชว์ผลก่อน เทสๆ##
+        elif choice == "0": ##เอาไว้โชว์ผลก่อน เทสๆ##
+            
             # avl.printTree(hotel.get_root)
             hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
