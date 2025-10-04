@@ -70,34 +70,52 @@ class AVLTree: ##อันนี้แชทแนะนำมาเอาไว
 
         return root
 
-    def inOrder(self, root): ##เรียงแขกตามหมายเลขห้อง##
+    def inOrder(self, root,listkeep=None): ##เรียงแขกตามหมายเลขห้อง##
+        if listkeep is None:
+            listkeep = []
+
         if not root:
-            return []
+            return listkeep
         
-        return self.inOrder(root.left) + [root.guest] + self.inOrder(root.right)
+        self.inOrder(root.left,listkeep)
+        listkeep.append(root.guest)
+        self.inOrder(root.right,listkeep)
+        
+        return listkeep
 
 class Hotel:
     def __init__(self):
         self.__root = None
         self.__tree = AVLTree()
-        self.__total_guests = 0
+        self.channel_map = {}
+        self.room_map = {}
 
-    def add_guests_channel(self, channel, count): ##เพิ่มแขกจากช่องทางเข้ามา พร้อมเลขห้อง##
-        for j in range(count):##วนรับแขกจากช่องทางนั้นๆ##
-            self.__total_guests += 1
-            room_number = self.__total_guests
-            new_guest = Guest(channel, j + 1, room_number)
+    def add_guests_channel(self, channel, count): 
+        guest_list = []
+        for j in range(count):
+            room_number = self.get_total_guests()
+            new_guest = Guest(channel, j, room_number)
+
             self.__root = self.__tree.insert(self.__root, new_guest)
+
+            # เก็บใน hash เพื่อ lookup O(1)
+            self.room_map[room_number] = new_guest
+            guest_list.append(new_guest)
+            self.temp_room = j
+        # อัปเดต channel map
+        if channel not in self.channel_map:
+            self.channel_map[channel] = []
+        self.channel_map[channel].extend(guest_list)
 
         print(f"Added {count} guests from channel {channel}.\n")
     
-    def show_all_guests(self): ##อันนี้แสดงแขกทั้งหมด สร้างไว้ test code ว่าทำงานถูกมั้ย##
-        guests = self.__tree.inOrder(self.__root)
-        for guest in guests:
+    def show_all_guests(self): 
+        listsort = self.__tree.inOrder(self.__root)
+        for guest in listsort:
             print(guest)
 
     def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
-        return self.__total_guests
+        return len(self.room_map)
     
 def menu():
     hotel = Hotel()
@@ -105,12 +123,11 @@ def menu():
     while True:
         print("\n====== Hilbert's Hotel Menu ======")
         print("1. Add Guests (ฟังก์ชัน 1)")
-        print("2. Assign Room Numbers (ฟังก์ชัน 2)")
-        print("3. Add More Guests (ฟังก์ชัน 3)")
-        print("4. Add Room Manual (ฟังก์ชัน 4)")
-        print("5. Delete Room Manual (ฟังก์ชัน 5)")
-        print("6. Sort Rooms (ฟังก์ชัน 6)")
-        print("7. Search Room (ฟังก์ชัน 7)")
+        print("2. Add More Guests (ฟังก์ชัน 2)")
+        print("3. Add Room Manual (ฟังก์ชัน 3)")
+        print("4. Delete Room Manual (ฟังก์ชัน 4)")
+        print("5. Sort Rooms (ฟังก์ชัน 5)")
+        print("6. Search Room (ฟังก์ชัน 6)")
         print("0. Exit") 
         print("===================================\n")
 
@@ -138,19 +155,15 @@ def menu():
             pass
 
         elif choice == "5":
-            pass
+            print("\n=== Sorted Rooms ===")
+            hotel.show_all_guests()
 
         elif choice == "6":
             pass
 
-        elif choice == "7":
-            pass
-
         elif choice == "0": ##เอาไว้โชว์ผลก่อน เทสๆ##
-            hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
             print("Exiting program...")
-            break
 
         else:
             print("Invalid choice, try again.")
