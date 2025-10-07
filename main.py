@@ -47,22 +47,14 @@ def menu():
 
         elif choice == "2":
             try:
-                print("")
-                channel = input("Enter channel name: ")
-                mode = input("Choose mode: (c) เอาห้องเรียงกันมั้ย or (l) เลือกห้องตามใจชอบ: ").lower()
-                
-                if mode == "c":
-                    count = int(input("Enter number of guests: "))
-                    hotel.add_rooms_manual(channel, count)
-                
-                elif mode == "l":
-                    rooms_str = input("Enter room numbers separated by commas: ")
-                    room_numbers = [int(x.strip()) for x in rooms_str.split(",")]
-                    hotel.add_rooms_manual_custom(channel, room_numbers)
+                aircraft_id = int(input("Enter ID of aircrafts : "))
+                barge_id = int(input("Enter ID of barges: "))
+                car_id = int(input("Enter ID of cars per barge: "))
 
-                else:
-                    print("Invalid mode!")
-
+                room_number = int(input("Enter room number: "))
+                
+                list_id = [aircraft_id, barge_id, car_id]
+                hotel.add_rooms_manual(room_number, list_id)
             except ValueError:
                 print("Invalid input, try again.")
 

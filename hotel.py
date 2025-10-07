@@ -122,42 +122,22 @@ class Hotel:
         return len(self.room_map)
     
     @timer
-    def add_rooms_manual_custom(self, channel, room_numbers):
-        added_guests = []
-        for order, room_number in enumerate(room_numbers):
+    def add_rooms_manual(self, room_number, list_channel):
+        aircraft_id = list_channel[0]
+        barge_id = list_channel[1]
+        car_id = list_channel[2]
 
-            if room_number in self.room_map:
-                print(f"Room {room_number} already occupied")
-                print(f"Please choose other room")
-                return None
-            new_guest = Guest(channel, order, room_number)
-            self.__root = self.__tree.insert(self.__root, new_guest)
-            self.room_map[room_number] = new_guest
-            added_guests.append(new_guest)
+        new_guest = Guest(0, aircraft_id, barge_id, car_id, room_number)
+        self.__root = self.__tree.insert(self.__root, new_guest)
+        final_room = self.room_map.insert(room_number, new_guest)
 
-        if added_guests:
-            print(f"Added {len(added_guests)} guests manually to channel '{channel}'")
-        return added_guests
-    
-    @timer
-    def add_rooms_manual(self, channel, count):
-        added_guests = []
-        room = self.__tree.inOrder(self.__root)
-        last_room = room[-1]
-        last_room = last_room.room
-        for order in range(count):
-            room_number = last_room + order
-            if room_number in self.room_map:
-                print(f"Room {room_number} already occupied! Skipping...")
-                continue
-            new_guest = Guest(channel, order, room_number)
-            self.__root = self.__tree.insert(self.__root, new_guest)
-            self.room_map[room_number] = new_guest
-            added_guests.append(new_guest)
+        if room_number != final_room:
+            print(f"The room number cannot be issued.")
+            print(f"Your room is {final_room}")
 
-        if added_guests:
-            print(f"Added {len(added_guests)} guests manually to channel '{channel}'")
-        return added_guests
+        self.all_guests_ever.append(new_guest)
+
+
     
     @timer
     def remove_guest_by_room(self, room_number):

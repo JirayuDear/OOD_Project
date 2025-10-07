@@ -34,11 +34,9 @@ class HashTable:
             self.resize()
             
         final_key = preferred_key
-        # Loop ที่ช้านี้จะทำงานเฉพาะตอนเพิ่มแขกใหม่เท่านั้น
         while self.search(final_key) is not None:
             final_key += 1
 
-        # เมื่อได้ final_key แล้ว ก็เรียกใช้ internal_insert ที่เร็วมาก
         self._internal_insert(final_key, value)
         
         return final_key
