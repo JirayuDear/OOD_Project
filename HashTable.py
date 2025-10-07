@@ -1,7 +1,6 @@
 # hash_table.py (Optimized Resize Version)
 
 class HashTable:
-    # ... (__init__, load_factor, _hash, search เหมือนเดิม) ...
     def __init__(self, size=16):
         self.size = size
         self.table = [None] * self.size
@@ -11,6 +10,9 @@ class HashTable:
     @property
     def load_factor(self):
         return self.count / self.size
+    
+    def __len__(self):
+        return self.count
 
     def _hash(self, key):
         return key % self.size
@@ -64,6 +66,21 @@ class HashTable:
         for item in old_table:
             if item is not None and item != self._DELETED:
                 self._internal_insert(item[0], item[1])
+
+    def remove(self, key):
+        index = self._hash(key)
+        start_index = index
+        while self.table[index] is not None:
+            if self.table[index] != self._DELETED and self.table[index][0] == key:
+                # ใช้ Tombstone มาร์คตำแหน่งว่าถูกลบแล้ว
+                self.table[index] = self._DELETED
+                self.count -= 1
+                return True # คืนค่าว่าลบสำเร็จ
+
+            index = (index + 1) % self.size
+            if index == start_index:
+                return False # วนกลับมาที่เดิมแล้วแต่ไม่เจอ
+        return False # ไม่เจอ key ที่จะลบ
 
 
 
