@@ -8,7 +8,7 @@ class Guest:
         self.room = room
 
     def get_channel_string(self):
-        # ถ้าเป็นแขกเริ่มต้น (ที่เราจะมาร์คด้วย -1) ให้แสดงผลเป็นพิเศษ
+        # ถ้าเป็นแขกเริ่มต้น (ที่เราจะมาร์คด้วย -1) ให้แสดงผลเป็นแขกเริ่มต้น
         if self.aircraft_id == -1:
             return f"initial_guest"
         return f"aircraft{self.aircraft_id}_barge{self.barge_id}_car{self.car_id}"
