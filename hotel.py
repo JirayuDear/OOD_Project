@@ -1,13 +1,13 @@
 import time
 from guest import Guest
 from avl_tree import AVLTree
+from HashTable import HashTable
 
 class Hotel:
     def __init__(self):
         self.__root = None
         self.__tree = AVLTree()
-        self.channel_map = {}
-        self.room_map = {}
+        self.room_map = HashTable()
         self.last_barge_id = 0
         self.listsort = []
  
@@ -29,27 +29,28 @@ class Hotel:
             return result
         return wrapper
     
-    def cal_room(self, guest_num, cars_id, barge_id):
-        room_number = ((guest_num+1)**2) * ((cars_id+1)**3) * ((barge_id+1)**5)
+    def cal_room(self, guest_num, cars_id, barge_id, aircraft_id):
+        room_number = (((guest_num+1)**2) * ((cars_id+1)**3) * ((barge_id+1)**5) * ((aircraft_id+1)**7))
         return room_number
- 
+    
     @timer
-    def add_guests_info(self, list_channel):
-        for item in list_channel:
-            barge_id = item["barge"]
-            self.last_barge_id = barge_id + 1  
+    def add_guests_info(self, arrival_data): 
+        for aircraft in arrival_data:
+            aircraft_id = aircraft["aircraft_id"]
+            for barge in aircraft["barges"]:
+                barge_id = barge["barge_id"]
+                cars_iterable = [(car["car_id"], car["num_people"]) for car in barge["cars"]]
+                for cars_id, count in cars_iterable:
+                    channel = f"aircraft{aircraft_id}_barge{barge_id}_car{cars_id}"
+                    for guest_num in range(count):
+                        preferred_room = self.cal_room(guest_num, cars_id, barge_id, aircraft_id)
+                        
+                        new_guest = Guest(channel, guest_num, preferred_room)
+                        final_room_number = self.room_map.insert(preferred_room, new_guest)                      
+                        new_guest.room = final_room_number
+                        
+                        self.__root = self.__tree.insert(self.__root, new_guest)
 
-            for cars_id, count in item["cars"].items():
-                channel = f"barge{barge_id}_car{cars_id}"  
-                guest_list = []
-
-                for guest_num in range(count):
-                    room_number = ((guest_num+1)**2) * ((cars_id+1)**3) * ((barge_id+1)**5)
-                    new_guest = Guest(channel, guest_num, room_number)
-                    self.__root = self.__tree.insert(self.__root, new_guest)
-
-                    self.room_map[room_number] = new_guest
-                    guest_list.append(new_guest)
     @timer
     def sort(self):
         self.listsort = self.__tree.inOrder(self.__root)
