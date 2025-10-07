@@ -18,21 +18,28 @@ def menu():
 
         if choice == "1":
             try:
-                num_barges = int(input("Enter number of barges: "))
+                num_aircrafts = int(input("Enter number of aircrafts in this new group: "))
+                num_barges = int(input("Enter number of barges per aircraft: "))
                 num_cars = int(input("Enter number of cars per barge: "))
                 num_people = int(input("Enter number of people per car: "))
             except ValueError:
                 print("Invalid number, try again.")
-                num_barges = num_cars = num_people = 0
+                continue
+            arrival_data = []
+            for ac_id in range(num_aircrafts):
+                aircraft_info = {"aircraft_id": ac_id,"barges": []}
+                
+                for b_id in range(num_barges):
+                    barge_info = {"barge_id": b_id,"cars": []}
 
-            start_barge_id = hotel.last_barge_id if hotel.last_barge_id > 0 else 0
-
-            list_channel = [
-                {"barge": start_barge_id + b, "cars": {c: num_people for c in range(num_cars)}}
-                for b in range(num_barges)
-            ]
-
-            hotel.add_guests_info(list_channel)
+                    for c_id in range(num_cars):                    
+                        car_info = {"car_id": c_id,"num_people": num_people,}
+                        barge_info["cars"].append(car_info)
+                        
+                    aircraft_info["barges"].append(barge_info)
+                
+                arrival_data.append(aircraft_info)
+            hotel.add_guests_info(arrival_data)
 
         elif choice == "2":
             try:
@@ -74,7 +81,6 @@ def menu():
                 print("Invalid room number!")
 
         elif choice == "6": ##เอาไว้โชว์ผลก่อน เทสๆ##
-            # avl.printTree(hotel.get_root)
             hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
 
