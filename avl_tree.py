@@ -121,6 +121,16 @@ class AVLTree: ##อันนี้แชทแนะนำมาเอาไว
             return self.__rotateLeft(root)
 
         return root
+    
+    def build_tree_from_sorted_list(self, sorted_guests):
+        if not sorted_guests:
+            return None
+        mid = len(sorted_guests) // 2
+        node = AVLNode(sorted_guests[mid])
+        node.left = self.build_tree_from_sorted_list(sorted_guests[:mid])
+        node.right = self.build_tree_from_sorted_list(sorted_guests[mid+1:])
+        node.height = 1 + max(self.__getHight(node.left), self.__getHight(node.right))
+        return node
 
     def printTree(self, node, level=0):
         if node is not None:
