@@ -63,11 +63,9 @@ class HashTable:
         
         for item in old_table:
             if item is not None and item != self._DELETED:
-                # เรียกใช้เมธอดภายในที่เร็วมาก ไม่มีการ search ซ้อน
                 self._internal_insert(item[0], item[1])
 
 
 
 
 
-                

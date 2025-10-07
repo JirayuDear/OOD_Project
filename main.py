@@ -81,7 +81,6 @@ def menu():
                 print("Invalid room number!")
 
         elif choice == "6": ##เอาไว้โชว์ผลก่อน เทสๆ##
-            # avl.printTree(hotel.get_root)
             hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
 

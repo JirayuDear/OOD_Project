@@ -44,7 +44,7 @@ class Hotel:
                     channel = f"aircraft{aircraft_id}_barge{barge_id}_car{cars_id}"
                     for guest_num in range(count):
                         preferred_room = self.cal_room(guest_num, cars_id, barge_id, aircraft_id)
-                        
+
                         new_guest = Guest(channel, guest_num, preferred_room)
                         final_room_number = self.room_map.insert(preferred_room, new_guest)                      
                         new_guest.room = final_room_number
@@ -115,13 +115,25 @@ class Hotel:
         return added_guests
     
     @timer
-    def delete_room_manual(self, room_number):
-        if room_number not in self.room_map:
-            print(f"Room {room_number} not found! can't delete")
+    def remove_guest_by_room(self, room_number):
+        guest_to_remove = self.room_map.search(room_number)
+
+        if guest_to_remove is None:
+            print(f"Error: Room {room_number} not found or is empty. Cannot remove.")
+            return None
+
+        print(f"Found guest to remove: {guest_to_remove}")
+        was_removed_from_map = self.room_map.remove(room_number)
+        if not was_removed_from_map:
+            print(f"Error: Failed to remove guest from room map. Data might be inconsistent.")
             return None
         
-        guest = self.room_map[room_number]
+        print(f"Successfully removed from room map.")
+
         self.__root = self.__tree.delete(self.__root, room_number)
-        del self.room_map[room_number]
-        print(f"Deleted Guest {guest}")
-        return guest
+        print(f"Successfully removed from AVL tree.")
+    
+        self.listsort = []
+        
+        print(f"Successfully removed guest from room {room_number}.")
+        return guest_to_remove
