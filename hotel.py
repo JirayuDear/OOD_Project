@@ -2,6 +2,7 @@ import time
 from guest import Guest
 from avl_tree import AVLTree
 from HashTable import HashTable
+import sys
 
 class Hotel:
     def __init__(self):
@@ -49,6 +50,7 @@ class Hotel:
                         guest = Guest(order=guest_num, aircraft_id=aircraft_id, barge_id=barge_id, car_id=cars_id)
                         newly_arrived_guests.append(guest)
         self.add_guests_info(newly_arrived_guests)
+        self.show_memory_usage()
 
     def add_guests_info(self, new_guests_list, is_initial=False):
         if is_initial:
@@ -96,6 +98,7 @@ class Hotel:
             self.__root = self.__tree.insert(self.__root, guest)
             initial_guests_list.append(guest)
         self.all_guests_ever.extend(initial_guests_list)
+        self.show_memory_usage()
 
     @timer
     def sort(self):
@@ -127,18 +130,19 @@ class Hotel:
         barge_id = list_channel[1]
         car_id = list_channel[2]
 
+        
         new_guest = Guest(0, aircraft_id, barge_id, car_id, room_number)
-        self.__root = self.__tree.insert(self.__root, new_guest)
         final_room = self.room_map.insert(room_number, new_guest)
+        new_guest = Guest(0, aircraft_id, barge_id, car_id, final_room)
+        self.__root = self.__tree.insert(self.__root, new_guest)
 
         if room_number != final_room:
             print(f"The room number cannot be issued.")
             print(f"Your room is {final_room}")
 
         self.all_guests_ever.append(new_guest)
+        self.show_memory_usage()
 
-
-    
     @timer
     def remove_guest_by_room(self, room_number):
         guest_to_remove = self.room_map.search(room_number)
@@ -161,4 +165,38 @@ class Hotel:
         self.listsort = []
         
         print(f"Successfully removed guest from room {room_number}.")
+        self.show_memory_usage()
         return guest_to_remove
+    
+    @staticmethod
+    def get_deep_size(obj, seen=None):
+        """คำนวณหน่วยความจำทั้งหมดของ obj รวมของที่อ้างอิงอยู่ภายใน"""
+        size = sys.getsizeof(obj)
+        if seen is None:
+            seen = set()
+        obj_id = id(obj)
+        if obj_id in seen:
+            return 0
+        seen.add(obj_id)
+
+        if isinstance(obj, dict):
+            size += sum(Hotel.get_deep_size(k, seen) + Hotel.get_deep_size(v, seen) for k, v in obj.items())
+        elif hasattr(obj, '__dict__'):
+            size += Hotel.get_deep_size(vars(obj), seen)
+        elif isinstance(obj, (list, tuple, set, frozenset)):
+            size += sum(Hotel.get_deep_size(i, seen) for i in obj)
+        return size
+
+    def show_memory_usage(self):
+        """ฟังก์ชันแสดงหน่วยความจำหลังแต่ละการทำงาน"""
+        print("\n=== Memory Usage Report ===")
+        print(f"HashTable: {self.get_deep_size(self.room_map):,} bytes")
+        print(f"AVL Tree: {self.get_deep_size(self.__tree):,} bytes")
+        print(f"All Guest Records: {self.get_deep_size(self.all_guests_ever):,} bytes")
+        total = (
+            self.get_deep_size(self.room_map)
+            + self.get_deep_size(self.__tree)
+            + self.get_deep_size(self.all_guests_ever)
+        )
+        print(f"Total Memory Usage: {total:,} bytes")
+        print("============================\n")
