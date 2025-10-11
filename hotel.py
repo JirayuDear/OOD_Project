@@ -127,9 +127,11 @@ class Hotel:
         barge_id = list_channel[1]
         car_id = list_channel[2]
 
+        
         new_guest = Guest(0, aircraft_id, barge_id, car_id, room_number)
-        self.__root = self.__tree.insert(self.__root, new_guest)
         final_room = self.room_map.insert(room_number, new_guest)
+        new_guest = Guest(0, aircraft_id, barge_id, car_id, final_room)
+        self.__root = self.__tree.insert(self.__root, new_guest)
 
         if room_number != final_room:
             print(f"The room number cannot be issued.")
@@ -137,8 +139,6 @@ class Hotel:
 
         self.all_guests_ever.append(new_guest)
 
-
-    
     @timer
     def remove_guest_by_room(self, room_number):
         guest_to_remove = self.room_map.search(room_number)
