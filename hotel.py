@@ -168,6 +168,21 @@ class Hotel:
         self.show_memory_usage()
         return guest_to_remove
     
+    @timer
+    def export_guest_data(self, filename="guest_result.txt"):
+        
+        sorted_guests = self.__tree.inOrder(self.__root)
+
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("Channel+Order\tRoom\n")
+            f.write("=============================\n")
+            for guest in sorted_guests:
+                channel = guest.get_channel_string()
+                f.write(f"{channel}_order{guest.order}\t{guest.room}\n")
+
+        print(f"\n Export completed! Guest data saved to '{filename}'")
+
+    
     @staticmethod
     def get_deep_size(obj, seen=None):
         """คำนวณหน่วยความจำทั้งหมดของ obj รวมของที่อ้างอิงอยู่ภายใน"""
