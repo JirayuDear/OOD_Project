@@ -42,7 +42,7 @@ class HashTable:
         return final_key
 
     def _internal_insert(self, key, value):
-
+        value.room = key
         index = self._hash(key)
         start_index = index
         while self.table[index] is not None and self.table[index] != self._DELETED:
