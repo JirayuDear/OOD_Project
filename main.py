@@ -13,6 +13,8 @@ def menu():
         print("4. Sort Rooms")
         print("5. Search Room")
         print("6. Show All Guests")
+        print("7. Export Guest Data to File")  # << เพิ่มบรรทัดนี้
+
         print("00. Exit")
         print("===================================\n")
 
@@ -80,6 +82,9 @@ def menu():
         elif choice == "6": ##เอาไว้โชว์ผลก่อน เทสๆ##
             hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
+
+        elif choice == "7":
+            hotel.export_guest_data()
 
         elif choice == "00": 
             print("Exiting program...")
