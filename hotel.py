@@ -1,15 +1,17 @@
 import time
 from guest import Guest
 from avl_tree import AVLTree
+from HashTable import HashTable
+import sys
 
 class Hotel:
     def __init__(self):
         self.__root = None
         self.__tree = AVLTree()
-        self.channel_map = {}
-        self.room_map = {}
-        self.last_barge_id = 0
+        self.room_map = HashTable()
+        self.last_aircraft_id = 0
         self.listsort = []
+        self.all_guests_ever = []
  
     @property
     def get_tree(self):
@@ -29,27 +31,75 @@ class Hotel:
             return result
         return wrapper
     
-    def cal_room(self, guest_num, cars_id, barge_id):
-        room_number = ((guest_num+1)**2) * ((cars_id+1)**3) * ((barge_id+1)**5)
+    def cal_room(self, guest_num, cars_id, barge_id, aircraft_id):
+        room_number = (((guest_num+1)**2) * ((cars_id+1)**3) * ((barge_id+1)**5) * ((aircraft_id+1)**7))
         return room_number
- 
+    
     @timer
-    def add_guests_info(self, list_channel):
-        for item in list_channel:
-            barge_id = item["barge"]
-            self.last_barge_id = barge_id + 1  
+    def add_new_guests(self, arrival_data):
+        print(f"\nAdding new guests and starting re-accommodation...")
+        newly_arrived_guests = []
+        for aircraft in arrival_data:
+            aircraft_id = aircraft["aircraft_id"]
+            self.last_aircraft_id = max(self.last_aircraft_id, aircraft_id + 1)
+            for barge in aircraft["barges"]:
+                barge_id = barge["barge_id"]
+                cars_iterable = [(car["car_id"], car["num_people"]) for car in barge["cars"]]
+                for cars_id, count in cars_iterable:
+                    for guest_num in range(count):
+                        guest = Guest(order=guest_num, aircraft_id=aircraft_id, barge_id=barge_id, car_id=cars_id)
+                        newly_arrived_guests.append(guest)
+        self.add_guests_info(newly_arrived_guests)
+        self.show_memory_usage()
 
-            for cars_id, count in item["cars"].items():
-                channel = f"barge{barge_id}_car{cars_id}"  
-                guest_list = []
+    def add_guests_info(self, new_guests_list, is_initial=False):
+        if is_initial:
+            self.all_guests_ever = new_guests_list
+        else:
+            self.all_guests_ever.extend(new_guests_list)
 
-                for guest_num in range(count):
-                    room_number = ((guest_num+1)**2) * ((cars_id+1)**3) * ((barge_id+1)**5)
-                    new_guest = Guest(channel, guest_num, room_number)
-                    self.__root = self.__tree.insert(self.__root, new_guest)
+        print(f"Calculating new rooms for all {len(self.all_guests_ever)} guests...")
+        guests_with_new_rooms = []
+        used_rooms = set()
 
-                    self.room_map[room_number] = new_guest
-                    guest_list.append(new_guest)
+        for guest in self.all_guests_ever:
+            a_id, b_id, c_id = 0, 0, 0
+            if guest.aircraft_id == -1:
+                a_id, b_id, c_id = 0, 0, 0
+            else:
+                a_id, b_id, c_id = guest.aircraft_id, guest.barge_id, guest.car_id
+
+            preferred_room = self.cal_room(guest.order, c_id, b_id, a_id)
+            final_room = preferred_room
+            while final_room in used_rooms:
+                final_room += 1
+            
+            guest.room = final_room
+            used_rooms.add(final_room)
+            guests_with_new_rooms.append(guest)
+            
+        self.__root = None
+        self.room_map = HashTable(size=int(len(self.all_guests_ever) / 0.7) + 16)
+
+        for guest in guests_with_new_rooms:
+            self.room_map.insert(guest.room, guest)
+            self.__root = self.__tree.insert(self.__root, guest)
+            
+        self.listsort = []
+
+    @timer
+    def add_initial_guest(self, num_initial_guests):
+        initial_guests_list = []
+        
+        for i in range(num_initial_guests):
+            room_num = i + 1 
+            guest = Guest(order=i, aircraft_id=-1, barge_id=-1, car_id=-1, room=room_num)
+            self.room_map.insert(guest.room, guest)
+            self.__root = self.__tree.insert(self.__root, guest)
+            initial_guests_list.append(guest)
+        self.all_guests_ever.extend(initial_guests_list)
+        self.show_memory_usage()
+
     @timer
     def sort(self):
         self.listsort = self.__tree.inOrder(self.__root)
@@ -63,64 +113,105 @@ class Hotel:
 
     @timer
     def search_room(self, room_number):
-        guest = self.room_map.get(room_number, None)
-        if guest:
-            print(f"Found Guest: {guest}")
-            return guest
+        guest = self.room_map.search(room_number)
+        if guest is None:
+            print("No member in this room.")
         else:
-            print(f"Room {room_number} not found.")
-            return None
+            print(guest)
+
 
     @timer
     def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
         return len(self.room_map)
     
     @timer
-    def add_rooms_manual_custom(self, channel, room_numbers):
-        added_guests = []
-        for order, room_number in enumerate(room_numbers):
+    def add_rooms_manual(self, room_number, list_channel):
+        aircraft_id = list_channel[0]
+        barge_id = list_channel[1]
+        car_id = list_channel[2]
 
-            if room_number in self.room_map:
-                print(f"Room {room_number} already occupied!")
-                print(f"Please choose other room TT")
-                return None
-            new_guest = Guest(channel, order, room_number)
-            self.__root = self.__tree.insert(self.__root, new_guest)
-            self.room_map[room_number] = new_guest
-            added_guests.append(new_guest)
+        
+        new_guest = Guest(0, aircraft_id, barge_id, car_id, room_number)
+        final_room = self.room_map.insert(room_number, new_guest)
+        new_guest = Guest(0, aircraft_id, barge_id, car_id, final_room)
+        self.__root = self.__tree.insert(self.__root, new_guest)
 
-        if added_guests:
-            print(f"Added {len(added_guests)} guests manually to channel '{channel}'")
-        return added_guests
-    
+        if room_number != final_room:
+            print(f"The room number cannot be issued.")
+            print(f"Your room is {final_room}")
+
+        self.all_guests_ever.append(new_guest)
+        self.show_memory_usage()
+
     @timer
-    def add_rooms_manual(self, channel, count):
-        added_guests = []
-        room = self.__tree.inOrder(self.__root)
-        last_room = room[-1]
-        last_room = last_room.room
-        for order in range(count):
-            room_number = last_room + order
-            if room_number in self.room_map:
-                print(f"Room {room_number} already occupied! Skipping...")
-                continue
-            new_guest = Guest(channel, order, room_number)
-            self.__root = self.__tree.insert(self.__root, new_guest)
-            self.room_map[room_number] = new_guest
-            added_guests.append(new_guest)
+    def remove_guest_by_room(self, room_number):
+        guest_to_remove = self.room_map.search(room_number)
 
-        if added_guests:
-            print(f"Added {len(added_guests)} guests manually to channel '{channel}'")
-        return added_guests
-    
-    @timer
-    def delete_room_manual(self, room_number):
-        if room_number not in self.room_map:
-            print(f"Room {room_number} not found! can't delete")
+        if guest_to_remove is None:
+            print(f"Error: Room {room_number} not found or is empty. Cannot remove.")
+            return None
+
+        print(f"Found guest to remove: {guest_to_remove}")
+        was_removed_from_map = self.room_map.remove(room_number)
+        if not was_removed_from_map:
+            print(f"Error: Failed to remove guest from room map. Data might be inconsistent.")
             return None
         
-        guest = self.room_map[room_number]
+        print(f"Successfully removed from room map.")
+
         self.__root = self.__tree.delete(self.__root, room_number)
-        del self.room_map[room_number]
-        print(f"Deleted Guest {guest}")
-        return guest
+        print(f"Successfully removed from AVL tree.")
+    
+        self.listsort = []
+        
+        print(f"Successfully removed guest from room {room_number}.")
+        self.show_memory_usage()
+        return guest_to_remove
+    
+    @timer
+    def export_guest_data(self, filename="guest_result.txt"):
+        
+        sorted_guests = self.__tree.inOrder(self.__root)
+
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("Channel+Order\tRoom\n")
+            f.write("=============================\n")
+            for guest in sorted_guests:
+                channel = guest.get_channel_string()
+                f.write(f"{channel}_order{guest.order}\t{guest.room}\n")
+
+        print(f"\n Export completed! Guest data saved to '{filename}'")
+
+    
+    @staticmethod
+    def get_deep_size(obj, seen=None):
+        """คำนวณหน่วยความจำทั้งหมดของ obj รวมของที่อ้างอิงอยู่ภายใน"""
+        size = sys.getsizeof(obj)
+        if seen is None:
+            seen = set()
+        obj_id = id(obj)
+        if obj_id in seen:
+            return 0
+        seen.add(obj_id)
+
+        if isinstance(obj, dict):
+            size += sum(Hotel.get_deep_size(k, seen) + Hotel.get_deep_size(v, seen) for k, v in obj.items())
+        elif hasattr(obj, '__dict__'):
+            size += Hotel.get_deep_size(vars(obj), seen)
+        elif isinstance(obj, (list, tuple, set, frozenset)):
+            size += sum(Hotel.get_deep_size(i, seen) for i in obj)
+        return size
+
+    def show_memory_usage(self):
+        """ฟังก์ชันแสดงหน่วยความจำหลังแต่ละการทำงาน"""
+        print("\n=== Memory Usage Report ===")
+        print(f"HashTable: {self.get_deep_size(self.room_map):,} bytes")
+        print(f"AVL Tree: {self.get_deep_size(self.__tree):,} bytes")
+        print(f"All Guest Records: {self.get_deep_size(self.all_guests_ever):,} bytes")
+        total = (
+            self.get_deep_size(self.room_map)
+            + self.get_deep_size(self.__tree)
+            + self.get_deep_size(self.all_guests_ever)
+        )
+        print(f"Total Memory Usage: {total:,} bytes")
+        print("============================\n")
