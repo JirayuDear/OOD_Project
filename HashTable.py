@@ -59,7 +59,6 @@ class HashTable:
         self.size *= 2
         self.table = [None] * self.size
         self.count = 0
-        print(f"\n--- Resizing hash table to {self.size} (Fast Path) ---")
         
         for item in old_table:
             if item is not None and item != self._DELETED:
