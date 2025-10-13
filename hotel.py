@@ -135,7 +135,7 @@ class Hotel:
             print("Invalid choice. Sorting by actual room number (default).")
             self.listsort = self.__tree.inOrder(self.__root)
 
-        print(f"✅ Sort completed. {len(self.listsort)} guests sorted.\n")
+        print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
 
         
 
