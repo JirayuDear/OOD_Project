@@ -103,37 +103,9 @@ class Hotel:
 
     @timer
     def sortbytheway(self):
-        print("\n=== Sort Options ===")
-        print("1. Sort by arrival channel (aircraft → barge → car IDs)")
-        print("2. Sort by arrival order number")
-        print("3. Sort by actual room number (default AVL order)")
-        choice = input("Choose sort type: ").strip()
-
         
-        guests = [item[1] for item in self.room_map.table if item and item != self.room_map._DELETED]
-
-        if not guests:
-            print("No guests to sort.")
-            return
-
-        if choice == "1":
-            
-            print("\nSorting by (aircraft_id, barge_id, car_id)...")
-            self.listsort = sorted(guests, key=lambda g: (g.aircraft_id, g.barge_id, g.car_id))
-
-        elif choice == "2":
-           
-            print("\nSorting by order number...")
-            self.listsort = sorted(guests, key=lambda g: g.order)
-
-        elif choice == "3":
-            
-            print("\nSorting by actual room number (AVL Tree order)...")
-            self.listsort = self.__tree.inOrder(self.__root)
-
-        else:
-            print("Invalid choice. Sorting by actual room number (default).")
-            self.listsort = self.__tree.inOrder(self.__root)
+        print("\nSorting by actual room number (AVL Tree order)...")
+        self.listsort = self.__tree.inOrder(self.__root)
 
         print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
 
