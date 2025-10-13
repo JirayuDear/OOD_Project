@@ -104,7 +104,6 @@ class Hotel:
     @timer
     def sortbytheway(self):
         
-            
         print("\nSorting by actual room number (AVL Tree order)...")
         self.listsort = self.__tree.inOrder(self.__root)
 
