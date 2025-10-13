@@ -179,6 +179,9 @@ class Hotel:
         
         print(f"Successfully removed guest from room {room_number}.")
         self.show_memory_usage()
+
+        
+
         return guest_to_remove
     
     @timer
