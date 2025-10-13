@@ -110,8 +110,6 @@ class Hotel:
 
         print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
 
-        
-
     @timer
     def show_all_guests(self):
         import sys
@@ -123,7 +121,6 @@ class Hotel:
         else:
             for guest in self.listsort:
                 print(guest, flush=True)
-
 
     @timer
     def search_room(self, room_number):
@@ -176,8 +173,6 @@ class Hotel:
         self.__root = self.__tree.delete(self.__root, room_number)
         print(f"Successfully removed from AVL tree.")
     
-        self.listsort = []
-        
         print(f"Successfully removed guest from room {room_number}.")
         self.show_memory_usage()
         return guest_to_remove

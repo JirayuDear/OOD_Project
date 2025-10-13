@@ -2,7 +2,6 @@ from hotel import Hotel
 
 def menu():
     hotel = Hotel()
-    #print(f"DEBUG: hotel instance id = {id(hotel)}")
     initial_guest = int(input("Enter number of initial guest: "))
     hotel.add_initial_guest(initial_guest)
 
