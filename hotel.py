@@ -104,7 +104,6 @@ class Hotel:
     @timer
     def sortbytheway(self):
         
-            
         print("\nSorting by actual room number (AVL Tree order)...")
         self.listsort = self.__tree.inOrder(self.__root)
 
@@ -180,6 +179,9 @@ class Hotel:
         
         print(f"Successfully removed guest from room {room_number}.")
         self.show_memory_usage()
+
+        
+
         return guest_to_remove
     
     @timer
