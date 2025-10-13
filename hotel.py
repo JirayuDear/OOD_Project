@@ -144,13 +144,13 @@ class Hotel:
         import sys
         #print("boo", flush=True)
         if not self.listsort:
-            print("\n(Not sorted yet — showing unsorted guest list)\n", flush=True)
+            #print("\n(Not sorted yet — showing unsorted guest list)\n", flush=True)
             for slot in self.room_map.table:
                 if slot is not None and slot != self.room_map._DELETED:
                     guest = slot[1]
                     print(guest, flush=True)
         else:
-            print("\n(Showing sorted guest list)\n", flush=True)
+            #print("\n(Showing sorted guest list)\n", flush=True)
             for guest in self.listsort:
                 print(guest, flush=True)
 
@@ -211,6 +211,20 @@ class Hotel:
         print(f"Successfully removed guest from room {room_number}.")
         self.show_memory_usage()
         return guest_to_remove
+    
+    @timer
+    def export_guest_data(self, filename="guest_result.txt"):
+        
+        sorted_guests = self.__tree.inOrder(self.__root)
+
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("Channel\tOrder\tRoom\n")
+            f.write("=============================\n")
+            for guest in sorted_guests:
+                channel = guest.get_channel_string()
+                f.write(f"{channel}\torder{guest.order}\t{guest.room}\n")
+
+        print(f"\n Export completed! Guest data saved to '{filename}'")
     
     @staticmethod
     def get_deep_size(obj, seen=None):
