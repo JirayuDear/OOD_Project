@@ -51,7 +51,8 @@ class Hotel:
                         newly_arrived_guests.append(guest)
         self.add_guests_info(newly_arrived_guests)
         self.show_memory_usage()
-
+    
+    @timer
     def add_guests_info(self, new_guests_list, is_initial=False):
         if is_initial:
             self.all_guests_ever = new_guests_list
@@ -245,6 +246,7 @@ class Hotel:
             size += sum(Hotel.get_deep_size(i, seen) for i in obj)
         return size
 
+    @timer
     def show_memory_usage(self):
         """ฟังก์ชันแสดงหน่วยความจำหลังแต่ละการทำงาน"""
         print("\n=== Memory Usage Report ===")
