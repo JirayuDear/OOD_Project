@@ -2,6 +2,7 @@ from hotel import Hotel
 
 def menu():
     hotel = Hotel()
+    #print(f"DEBUG: hotel instance id = {id(hotel)}")
     initial_guest = int(input("Enter number of initial guest: "))
     hotel.add_initial_guest(initial_guest)
 
@@ -68,8 +69,8 @@ def menu():
                 print("Invalid input, try again.")
 
         elif choice == "4":
+            hotel.sortbytheway()
             print("\n===Already Sorted Rooms ===")
-            hotel.sort()
             
 
         elif choice == "5":

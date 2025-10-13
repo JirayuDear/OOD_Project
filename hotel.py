@@ -100,16 +100,60 @@ class Hotel:
         self.all_guests_ever.extend(initial_guests_list)
         self.show_memory_usage()
 
+
     @timer
-    def sort(self):
-        self.listsort = self.__tree.inOrder(self.__root)
+    def sortbytheway(self):
+        print("\n=== Sort Options ===")
+        print("1. Sort by arrival channel (aircraft → barge → car IDs)")
+        print("2. Sort by arrival order number")
+        print("3. Sort by actual room number (default AVL order)")
+        choice = input("Choose sort type: ").strip()
+
         
+        guests = [item[1] for item in self.room_map.table if item and item != self.room_map._DELETED]
+
+        if not guests:
+            print("No guests to sort.")
+            return
+
+        if choice == "1":
+            
+            print("\nSorting by (aircraft_id, barge_id, car_id)...")
+            self.listsort = sorted(guests, key=lambda g: (g.aircraft_id, g.barge_id, g.car_id))
+
+        elif choice == "2":
+           
+            print("\nSorting by order number...")
+            self.listsort = sorted(guests, key=lambda g: g.order)
+
+        elif choice == "3":
+            
+            print("\nSorting by actual room number (AVL Tree order)...")
+            self.listsort = self.__tree.inOrder(self.__root)
+
+        else:
+            print("Invalid choice. Sorting by actual room number (default).")
+            self.listsort = self.__tree.inOrder(self.__root)
+
+        print(f"✅ Sort completed. {len(self.listsort)} guests sorted.\n")
+
+        
+
     @timer
-    def show_all_guests(self): ##อันนี้แสดงแขกทั้งหมด สร้างไว้ test code ว่าทำงานถูกมั้ย##
-        # listsort = self.__tree.inOrder(self.__root)
-        # print(self.__tree.printTree(self.__root))
-        for guest in self.listsort:
-            print(guest)
+    def show_all_guests(self):
+        import sys
+        #print("boo", flush=True)
+        if not self.listsort:
+            print("\n(Not sorted yet — showing unsorted guest list)\n", flush=True)
+            for slot in self.room_map.table:
+                if slot is not None and slot != self.room_map._DELETED:
+                    guest = slot[1]
+                    print(guest, flush=True)
+        else:
+            print("\n(Showing sorted guest list)\n", flush=True)
+            for guest in self.listsort:
+                print(guest, flush=True)
+
 
     @timer
     def search_room(self, room_number):
@@ -167,21 +211,6 @@ class Hotel:
         print(f"Successfully removed guest from room {room_number}.")
         self.show_memory_usage()
         return guest_to_remove
-    
-    @timer
-    def export_guest_data(self, filename="guest_result.txt"):
-        
-        sorted_guests = self.__tree.inOrder(self.__root)
-
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write("Channel+Order\tRoom\n")
-            f.write("=============================\n")
-            for guest in sorted_guests:
-                channel = guest.get_channel_string()
-                f.write(f"{channel}_order{guest.order}\t{guest.room}\n")
-
-        print(f"\n Export completed! Guest data saved to '{filename}'")
-
     
     @staticmethod
     def get_deep_size(obj, seen=None):
