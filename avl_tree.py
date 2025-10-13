@@ -137,3 +137,10 @@ class AVLTree: ##อันนี้แชทแนะนำมาเอาไว
             self.printTree(node.right, level + 1)
             print('     ' * level, node.guest)
             self.printTree(node.left, level + 1)
+
+    def writeInOrder(self, node, f):
+        if node:
+            self.writeInOrder(node.left, f)
+            guest = node.guest
+            f.write(f"{guest.get_channel_string()}\torder{guest.order}\t{guest.room}\n")
+            self.writeInOrder(node.right, f)
