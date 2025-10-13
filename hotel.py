@@ -100,16 +100,29 @@ class Hotel:
         self.all_guests_ever.extend(initial_guests_list)
         self.show_memory_usage()
 
+
     @timer
-    def sort(self):
-        self.listsort = self.__tree.inOrder(self.__root)
+    def sortbytheway(self):
         
+        print("\nSorting by actual room number (AVL Tree order)...")
+        self.listsort = self.__tree.inOrder(self.__root)
+
+        print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
+
+        
+
     @timer
-    def show_all_guests(self): ##อันนี้แสดงแขกทั้งหมด สร้างไว้ test code ว่าทำงานถูกมั้ย##
-        # listsort = self.__tree.inOrder(self.__root)
-        # print(self.__tree.printTree(self.__root))
-        for guest in self.listsort:
-            print(guest)
+    def show_all_guests(self):
+        import sys
+        if not self.listsort:
+            for slot in self.room_map.table:
+                if slot is not None and slot != self.room_map._DELETED:
+                    guest = slot[1]
+                    print(guest, flush=True)
+        else:
+            for guest in self.listsort:
+                print(guest, flush=True)
+
 
     @timer
     def search_room(self, room_number):
@@ -166,7 +179,18 @@ class Hotel:
         
         print(f"Successfully removed guest from room {room_number}.")
         self.show_memory_usage()
+
+        
+
         return guest_to_remove
+    
+    @timer
+    def export_guest_data(self, filename="guest_result.txt"):
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("Channel\tOrder\tRoom\n")
+            f.write("=============================\n")
+            self.__tree.writeInOrder(self.__root, f)
+
     
     @staticmethod
     def get_deep_size(obj, seen=None):
