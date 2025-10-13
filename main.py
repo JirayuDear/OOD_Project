@@ -2,6 +2,7 @@ from hotel import Hotel
 
 def menu():
     hotel = Hotel()
+    #print(f"DEBUG: hotel instance id = {id(hotel)}")
     initial_guest = int(input("Enter number of initial guest: "))
     hotel.add_initial_guest(initial_guest)
 
@@ -13,6 +14,8 @@ def menu():
         print("4. Sort Rooms")
         print("5. Search Room")
         print("6. Show All Guests")
+        print("7. Export Guest Data to File")  # << เพิ่มบรรทัดนี้
+
         print("00. Exit")
         print("===================================\n")
 
@@ -66,8 +69,8 @@ def menu():
                 print("Invalid input, try again.")
 
         elif choice == "4":
+            hotel.sortbytheway()
             print("\n===Already Sorted Rooms ===")
-            hotel.sort()
             
 
         elif choice == "5":
@@ -80,6 +83,9 @@ def menu():
         elif choice == "6": ##เอาไว้โชว์ผลก่อน เทสๆ##
             hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
+
+        elif choice == "7":
+            hotel.export_guest_data()
 
         elif choice == "00": 
             print("Exiting program...")
