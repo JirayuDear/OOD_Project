@@ -64,11 +64,14 @@ def menu():
             try:
                 room_number = int(input("Choose room number to delete "))
                 hotel.remove_guest_by_room(room_number)
+                if sortbytheway == True:
+                    hotel.sortbytheway()
             except ValueError:
                 print("Invalid input, try again.")
 
         elif choice == "4":
             hotel.sortbytheway()
+            sortbytheway = True
             print("\n===Already Sorted Rooms ===")
             
 
