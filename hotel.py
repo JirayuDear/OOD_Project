@@ -135,22 +135,19 @@ class Hotel:
             print("Invalid choice. Sorting by actual room number (default).")
             self.listsort = self.__tree.inOrder(self.__root)
 
-        print(f"✅ Sort completed. {len(self.listsort)} guests sorted.\n")
+        print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
 
         
 
     @timer
     def show_all_guests(self):
         import sys
-        #print("boo", flush=True)
         if not self.listsort:
-            #print("\n(Not sorted yet — showing unsorted guest list)\n", flush=True)
             for slot in self.room_map.table:
                 if slot is not None and slot != self.room_map._DELETED:
                     guest = slot[1]
                     print(guest, flush=True)
         else:
-            #print("\n(Showing sorted guest list)\n", flush=True)
             for guest in self.listsort:
                 print(guest, flush=True)
 
@@ -214,17 +211,11 @@ class Hotel:
     
     @timer
     def export_guest_data(self, filename="guest_result.txt"):
-        
-        sorted_guests = self.__tree.inOrder(self.__root)
-
         with open(filename, "w", encoding="utf-8") as f:
             f.write("Channel\tOrder\tRoom\n")
             f.write("=============================\n")
-            for guest in sorted_guests:
-                channel = guest.get_channel_string()
-                f.write(f"{channel}\torder{guest.order}\t{guest.room}\n")
+            self.__tree.writeInOrder(self.__root, f)
 
-        print(f"\n Export completed! Guest data saved to '{filename}'")
     
     @staticmethod
     def get_deep_size(obj, seen=None):
