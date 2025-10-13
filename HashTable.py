@@ -1,5 +1,3 @@
-# hash_table.py (Optimized Resize Version)
-
 class HashTable:
     def __init__(self, size=16):
         self.size = size

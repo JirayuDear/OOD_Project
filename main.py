@@ -51,7 +51,7 @@ def menu():
             try:
                 aircraft_id = int(input("Enter ID of aircrafts : "))
                 barge_id = int(input("Enter ID of barges: "))
-                car_id = int(input("Enter ID of cars per barge: "))
+                car_id = int(input("Enter ID of cars: "))
 
                 room_number = int(input("Enter room number: "))
                 
