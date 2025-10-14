@@ -1,17 +1,11 @@
-
 class Guest:
-    def __init__(self, order, aircraft_id, barge_id, car_id, room=0):
-        self.order = order # guest_num
-        self.aircraft_id = aircraft_id
-        self.barge_id = barge_id
-        self.car_id = car_id
-        self.room = room
+    def __init__(self, order, channel_ids, preferred_room, channel_names):
+        self.order = order                 # ลำดับของแขก
+        self.channel_ids = channel_ids     # ID ของแต่ละช่องทาง เช่น [1, 3]
+        self.preferred_room = preferred_room # **ห้องที่ต้องการ (คำนวณแค่ครั้งเดียวตอนสร้าง)**
+        self.channel_names = channel_names # ชื่อช่องทาง (เพื่อแสดงผล)
+        self.room = -1                     # ห้องจริงที่ได้รับ
 
-    def get_channel_string(self):
-        # ถ้าเป็นแขกเริ่มต้น (ที่เราจะมาร์คด้วย -1) ให้แสดงผลเป็นแขกเริ่มต้น
-        if self.aircraft_id == -1:
-            return f"initial_guest"
-        return f"aircraft{self.aircraft_id}_barge{self.barge_id}_car{self.car_id}"
-
-    def __repr__(self):
-        return f"Guest(channel={self.get_channel_string()}, order={self.order}, room={self.room})"
+    def __str__(self):
+        path_str = ' -> '.join(f"{name} {id}" for name, id in zip(self.channel_names, self.channel_ids))
+        return f"Guest(Path: {path_str}, Order: {self.order}, Pref. Room: {self.preferred_room}, Final Room: {self.room})"
