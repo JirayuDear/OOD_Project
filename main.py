@@ -2,8 +2,12 @@ from hotel import Hotel
 
 def menu():
     hotel = Hotel()
-    initial_guest = int(input("Enter number of initial guest: "))
-    hotel.add_initial_guest(initial_guest)
+    try:
+        initial_guest = int(input("Enter number of initial guests: "))
+        hotel.add_initial_guest(initial_guest)
+    except ValueError:
+        print("Invalid number. Starting with 0 initial guests.")
+        hotel.add_initial_guest(0)
 
     sortbytheway = False
 
@@ -20,35 +24,24 @@ def menu():
         print("00. Exit")
         print("===================================\n")
 
-
         choice = input("Choose an option: ")
-
         if choice == "1":
             try:
-                num_aircrafts = int(input("Enter number of aircrafts in this new group: "))
-                num_barges = int(input("Enter number of barges per aircraft: "))
-                num_cars = int(input("Enter number of cars per barge: "))
-                num_people = int(input("Enter number of people per car: "))
-            except ValueError:
-                print("Invalid number, try again.")
-                continue
+                num_channels = int(input("Enter number of new arrival channels: "))
+                arrival_channels = []
+                for i in range(num_channels):
+                    name = input(f"Enter name for channel #{i+1}: ")
+                    count = int(input(f"Enter number of guests from channel '{name}': "))
+                    if count < 0: raise ValueError
+                    arrival_channels.append({'name': name, 'count': count})
                 
-            arrival_data = []
-            start_aircraft_id = hotel.last_aircraft_id
-            for i in range(num_aircrafts):
-                ac_id = start_aircraft_id + i
-                aircraft_info = {"aircraft_id": ac_id,"barges": []}
-                for b_id in range(num_barges):
-                    barge_info = {"barge_id": b_id,"cars": []}
-                    for c_id in range(num_cars): 
-                        car_info = {"car_id": c_id,"num_people": num_people}
-                        barge_info["cars"].append(car_info)
-                        
-                    aircraft_info["barges"].append(barge_info)
-                
-                arrival_data.append(aircraft_info)
-            hotel.add_new_guests(arrival_data)
+                if arrival_channels:
+                    hotel.add_new_guests(arrival_channels)
 
+            except ValueError:
+                print("Invalid input. Please enter valid names and positive numbers.")
+                continue
+            
         elif choice == "2":
             try:
                 aircraft_id = int(input("Enter ID of aircraft : "))
