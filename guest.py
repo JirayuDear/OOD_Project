@@ -1,17 +1,16 @@
+# guest.py
 
 class Guest:
-    def __init__(self, order, aircraft_id, barge_id, car_id, room=0):
-        self.order = order # guest_num
-        self.aircraft_id = aircraft_id
-        self.barge_id = barge_id
-        self.car_id = car_id
-        self.room = room
+    def __init__(self, order, channel_ids, preferred_room, channel_names, arrival_round):
+        self.order = order
+        self.channel_ids = channel_ids
+        self.preferred_room = preferred_room
+        self.channel_names = channel_names
+        self.arrival_round = arrival_round  # CHANGED: Renamed for clarity
+        self.room = -1
 
-    def get_channel_string(self):
-        # ถ้าเป็นแขกเริ่มต้น (ที่เราจะมาร์คด้วย -1) ให้แสดงผลเป็นแขกเริ่มต้น
-        if self.aircraft_id == -1:
-            return f"initial_guest"
-        return f"aircraft{self.aircraft_id}_barge{self.barge_id}_car{self.car_id}"
-
-    def __repr__(self):
-        return f"Guest(channel={self.get_channel_string()}, order={self.order}, room={self.room})"
+    def __str__(self):
+        path_str = ' -> '.join(f"{name} {id_}" for name, id_ in zip(self.channel_names, self.channel_ids))
+        # CHANGED: Added arrival_round to the printout
+        return (f"Guest(Round: {self.arrival_round}, Path: {path_str}, Order: {self.order}, "
+                f"Room: {self.room})")
