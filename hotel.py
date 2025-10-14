@@ -12,6 +12,7 @@ class Hotel:
         self.last_aircraft_id = 0
         self.listsort = []
         self.all_guests_ever = []
+        self.arrival_round_counter = 0 
  
     @property
     def get_tree(self):
@@ -30,19 +31,20 @@ class Hotel:
             print(f"\n'{func.__name__}' runtime: {end - start:.6f} sec") 
             return result
         return wrapper
-    
+
     @timer
     def add_and_reaccommodate(self, new_guests_list):
         self.all_guests_ever.extend(new_guests_list)
-        print(f"\nRe-accommodating for all {len(self.all_guests_ever)} guests...")
+        print(f"\nRe-accommodating for ALL {len(self.all_guests_ever)} guests...")
 
         used_rooms = set()
+        self.room_map = HashTable()
+        self.__root = None
 
         sorted_guests = sorted(self.all_guests_ever, key=lambda g: g.preferred_room)
 
         for guest in sorted_guests:
             final_room = guest.preferred_room
-            
             while final_room in used_rooms:
                 final_room += 1
             
@@ -52,20 +54,10 @@ class Hotel:
             self.__root = self.__tree.insert(self.__root, guest)
 
         self.all_guests_ever = sorted_guests
-        print("Re-accommodation complete.")
-
-    # @timer
-    # def add_initial_guest(self, num_initial_guests):
-    #     initial_guests_list = []
         
-    #     for i in range(num_initial_guests):
-    #         room_num = i + 1 
-    #         guest = Guest(order=i, aircraft_id=-1, barge_id=-1, car_id=-1, room=room_num)
-    #         self.room_map.insert(guest.room, guest)
-    #         self.__root = self.__tree.insert(self.__root, guest)
-    #         initial_guests_list.append(guest)
-    #     self.all_guests_ever.extend(initial_guests_list)
-    #     self.show_memory_usage()
+        self.arrival_round_counter += 1
+        print("Full re-accommodation complete.")
+        # self.show_memory_usage() 
 
     @timer
     def sortbytheway(self):
@@ -106,15 +98,11 @@ class Hotel:
     
     @timer
     def add_rooms_manual(self, room_number, list_channel):
-        # ... (ส่วนการแตก list_channel เหมือนเดิม) ...
         aircraft_id = list_channel[0]
         barge_id = list_channel[1]
         car_id = list_channel[2]
-
-        # สร้าง Guest ชั่วคราวเพื่อส่งไปยัง Hash Table (ใช้ room_number ที่ต้องการ)
         new_guest_temp = Guest(0, aircraft_id, barge_id, car_id, room_number)
 
-        # Hash Table จะคืนค่า (ห้องที่ขอ, ห้องที่ว่างจริง)
         preferred_room, final_room = self.room_map.insert2(room_number, new_guest_temp) 
 
         if preferred_room != final_room:
