@@ -58,7 +58,6 @@ class Hotel:
         
         self.arrival_round_counter += 1
         print("Full re-accommodation complete.")
-        # self.show_memory_usage() 
 
     @timer
     def sortbytheway(self):
@@ -67,7 +66,6 @@ class Hotel:
         self.listsort = self.__tree.inOrder(self.__root)
 
         print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
-        self.show_memory_usage()
 
     @timer
     def show_all_guests(self):
@@ -81,7 +79,6 @@ class Hotel:
             for guest in self.listsort:
                 print(guest, flush=True)
 
-        self.show_memory_usage()
 
     @timer
     def search_room(self, room_number):
@@ -91,7 +88,6 @@ class Hotel:
         else:
             print(guest)
 
-        self.show_memory_usage()
 
     @timer
     def get_total_guests(self):
@@ -129,7 +125,6 @@ class Hotel:
             self.__root = self.__tree.insert(self.__root, guest)
             print(f"Guest successfully added to room {guest.room}.")
             self.all_guests_ever.append(guest)
-        self.show_memory_usage()
 
     @timer
     def remove_guest_by_room(self, room_number):
@@ -153,7 +148,6 @@ class Hotel:
         self.listsort = []
         
         print(f"Successfully removed guest from room {room_number}.")
-        self.show_memory_usage()
 
         return guest_to_remove
     
