@@ -1,16 +1,11 @@
 # guest.py
-
 class Guest:
-    def __init__(self, order, channel_ids, preferred_room, channel_names, arrival_round):
-        self.order = order
-        self.channel_ids = channel_ids
-        self.preferred_room = preferred_room
-        self.channel_names = channel_names
-        self.arrival_round = arrival_round  # CHANGED: Renamed for clarity
-        self.room = -1
+    def __init__(self, channel_name, channel_order, room=0):
+        self.channel_name = channel_name
+        self.channel_order = channel_order
+        self.room = room
 
-    def __str__(self):
-        path_str = ' -> '.join(f"{name} {id_}" for name, id_ in zip(self.channel_names, self.channel_ids))
-        # CHANGED: Added arrival_round to the printout
-        return (f"Guest(Round: {self.arrival_round}, Path: {path_str}, Order: {self.order}, "
-                f"Room: {self.room})")
+    # MODIFIED: ปรับปรุงการแสดงผลเป็นรูปแบบคอลัมน์ที่อ่านง่าย
+    def __repr__(self):
+        # จัดคอลัมน์: Channel (กว้าง 25 ตัวอักษร), Order (5), Room (ที่เหลือ)
+        return f"  {self.channel_name:<25} | Order: {self.channel_order+1:<5} | Room: {self.room}"
