@@ -92,13 +92,11 @@ def menu():
             initial_primes = generate_primes(2) 
             initial_guests_list = []
             
-            # Get the current round from the hotel (it will be 0)
             current_round = hotel.arrival_round_counter
 
             for i in range(initial_guest_count):
                 pref_room = calculate_room_dynamically(guest_order=0, channel_ids=[i], primes=initial_primes)
                 
-                # CHANGED: Pass the current_round
                 guest = Guest(order=0, 
                               channel_ids=[i], 
                               preferred_room=pref_room, 

@@ -13,6 +13,7 @@ class Hotel:
         self.listsort = []
         self.all_guests_ever = []
         self.arrival_round_counter = 0 
+        self.used_rooms = set()
  
     @property
     def get_tree(self):
