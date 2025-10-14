@@ -16,7 +16,6 @@ def menu():
         print("5. Search Room")
         print("6. Show All Guests")
         print("7. Export Guest Data to File") 
-
         print("00. Exit")
         print("===================================\n")
 
