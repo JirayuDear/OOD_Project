@@ -144,18 +144,21 @@ def menu():
             hotel.add_and_reaccommodate(newly_arrived_guests)
 
         elif choice == "2":
-            try:
-                aircraft_id = int(input("Enter ID of aircraft : "))
-                barge_id = int(input("Enter ID of barge: "))
-                car_id = int(input("Enter ID of car: "))
+            channel_input = input("\nEnter channel(Ex. ship,car): ")
+            channel_names = [name.strip() for name in channel_input.split(',')]
+            
+            if not channel_names:
+                print("Error one channel at least")
+                continue
 
-                room_number = int(input("Enter room number: "))
-                
-                list_id = [aircraft_id, barge_id, car_id]
-                hotel.add_rooms_manual(room_number, list_id)
-            except ValueError:
-                print("Invalid input, try again.")
+            primes = generate_primes(len(channel_names) + 1)
+            current_round = hotel.arrival_round_counter
+            arrival_data = prompt_for_arrivals_recursive(channel_names)
 
+            manual_guests = []
+            create_guests_recursive(arrival_data, channel_names, primes, [], manual_guests, current_round)
+            
+            hotel.add_rooms_manual(manual_guests)
         elif choice == "3":
             try:
                 room_number = int(input("Choose room number to delete "))
