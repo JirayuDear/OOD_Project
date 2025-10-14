@@ -52,6 +52,39 @@ class HashTable:
 
         self.table[index] = (key, value)
         self.count += 1
+    
+    def insert2(self, preferred_key, value):
+        # *เงื่อนไข condition=0 ถูกลบออก เพราะตรรกะนี้ไม่ตรงกับวัตถุประสงค์
+        
+        if self.load_factor > 0.7:
+            self.resize()
+            
+        final_key = preferred_key
+        
+        # ถ้า preferred_key ชน (มีแขกอยู่ในห้องนั้นแล้ว) ให้หาห้องว่างห้องถัดไป
+        while self.search(final_key) is not None:
+            final_key += 1 # Linear Probing ในระดับ Room Number
+        
+        # หาก final_key ไม่ใช่ preferred_key แสดงว่าเกิดการชน
+        if final_key != preferred_key:
+            return preferred_key, final_key # คืนค่าทั้งห้องที่ชนและห้องที่ว่าง
+        else:
+            # ถ้าไม่ชน ให้ทำการแทรกเลย
+            self._internal_insert2(final_key, value)
+            return final_key, final_key # คืนค่าห้องเดียวกัน
+            
+    def _internal_insert2(self, key, value):
+        # ... (โค้ดนี้ใช้สำหรับการแทรกจริง ๆ และไม่มีการเรียก search ซ้ำ)
+        value.room = key
+        index = self._hash(key)
+        start_index = index
+        while self.table[index] is not None and self.table[index] != self._DELETED:
+            index = (index + 1) % self.size
+            if index == start_index:
+                raise Exception("HashTable is full during internal insert")
+
+        self.table[index] = (key, value)
+        self.count += 1
         
     def resize(self):
 

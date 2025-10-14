@@ -139,21 +139,59 @@ class Hotel:
     
     @timer
     def add_rooms_manual(self, room_number, list_channel):
+        # ... (ส่วนการแตก list_channel เหมือนเดิม) ...
         aircraft_id = list_channel[0]
         barge_id = list_channel[1]
         car_id = list_channel[2]
 
+        # สร้าง Guest ชั่วคราวเพื่อส่งไปยัง Hash Table (ใช้ room_number ที่ต้องการ)
+        new_guest_temp = Guest(0, aircraft_id, barge_id, car_id, room_number)
+
+        # Hash Table จะคืนค่า (ห้องที่ขอ, ห้องที่ว่างจริง)
+        preferred_room, final_room = self.room_map.insert2(room_number, new_guest_temp) 
+
+        if preferred_room != final_room:
+            print(f"\n--- Room Collision Detected! ---")
+            print(f"Room {preferred_room} is occupied. The next available room is {final_room}.")
         
-        new_guest = Guest(0, aircraft_id, barge_id, car_id, room_number)
-        final_room = self.room_map.insert(room_number, new_guest)
-        new_guest = Guest(0, aircraft_id, barge_id, car_id, final_room)
-        self.__root = self.__tree.insert(self.__root, new_guest)
+            decision = input(f"Do you want to: (1) Take room {final_room}, (2) Choose another room, or (3) Cancel addition? (1/2/3): ")
+            
+            if decision == "1":
+            
+                final_room_to_use = final_room
+                
+            elif decision == "2":
+                
+                try:
+                    new_manual_room = int(input("Enter new room number: "))
+                    print(f"Attempting to add guest to room {new_manual_room}...")
+                    self.add_rooms_manual(new_manual_room, list_channel)
+                    return 
+                except ValueError:
+                    print("Invalid input. Cancelling addition.")
+                    return
+                    
+            elif decision == "3":
+                print("Room addition cancelled.")
+                return
 
-        if room_number != final_room:
-            print(f"The room number cannot be issued.")
-            print(f"Your room is {final_room}")
+            else:
+                print("Invalid choice. Taking the next available room by default.")
+                final_room_to_use = final_room
+                
+        else:
+            final_room_to_use = final_room
+            
+        new_guest_final = Guest(0, aircraft_id, barge_id, car_id, final_room_to_use)
 
-        self.all_guests_ever.append(new_guest)
+        if preferred_room != final_room_to_use:
+            self.room_map._internal_insert2(final_room_to_use, new_guest_final)
+
+        self.__root = self.__tree.insert(self.__root, new_guest_final)
+
+        print(f"Guest successfully added to room {final_room_to_use}.")
+
+        self.all_guests_ever.append(new_guest_final)
         self.show_memory_usage()
 
     @timer

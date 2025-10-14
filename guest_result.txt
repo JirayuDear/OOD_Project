@@ -1,5 +1,6 @@
 Channel	Order	Room
 =============================
+<<<<<<< HEAD
 aircraft0_barge0_car0	order0	1
 aircraft0_barge0_car0	order1	4
 aircraft0_barge0_car1	order0	8
@@ -116,3 +117,11 @@ aircraft2_barge0_car0	order96	20577483
 aircraft2_barge0_car0	order97	21003948
 aircraft2_barge0_car0	order98	21434787
 aircraft2_barge0_car0	order99	21870000
+=======
+initial_guest	order0	1
+initial_guest	order1	2
+aircraft1_barge1_car1	order0	3
+initial_guest	order3	4
+initial_guest	order4	5
+aircraft1_barge1_car1	order0	6
+>>>>>>> jirapol
