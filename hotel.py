@@ -68,11 +68,6 @@ class Hotel:
         self.listsort = self.__tree.inOrder(self.__root)
 
         print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
-<<<<<<< HEAD
-
-        
-=======
->>>>>>> origin/main
 
     @timer
     def show_all_guests(self):
@@ -101,25 +96,6 @@ class Hotel:
         return len(self.room_map)
     
     @timer
-<<<<<<< HEAD
-    def add_rooms_manual(self, room_number, list_channel):
-        aircraft_id = list_channel[0]
-        barge_id = list_channel[1]
-        car_id = list_channel[2]
-
-        
-        new_guest = Guest(0, aircraft_id, barge_id, car_id, room_number)
-        final_room = self.room_map.insert(room_number, new_guest)
-        new_guest = Guest(0, aircraft_id, barge_id, car_id, final_room)
-        self.__root = self.__tree.insert(self.__root, new_guest)
-
-        if room_number != final_room:
-            print(f"The room number cannot be issued.")
-            print(f"Your room is {final_room}")
-
-        self.all_guests_ever.append(new_guest)
-        self.show_memory_usage()
-=======
     def add_rooms_manual(self, guest_list):
         for guest in guest_list:
             # ตรวจสอบห้องว่างและจัดการกรณีชนห้อง
@@ -151,7 +127,6 @@ class Hotel:
             self.__root = self.__tree.insert(self.__root, guest)
             print(f"Guest successfully added to room {guest.room}.")
             self.all_guests_ever.append(guest)
->>>>>>> origin/main
 
     @timer
     def remove_guest_by_room(self, room_number):
@@ -175,11 +150,6 @@ class Hotel:
         self.listsort = []
         
         print(f"Successfully removed guest from room {room_number}.")
-<<<<<<< HEAD
-        self.show_memory_usage()
-=======
-
->>>>>>> origin/main
         return guest_to_remove
     
     @timer
