@@ -2,9 +2,10 @@ from hotel import Hotel
 
 def menu():
     hotel = Hotel()
-    #print(f"DEBUG: hotel instance id = {id(hotel)}")
     initial_guest = int(input("Enter number of initial guest: "))
     hotel.add_initial_guest(initial_guest)
+
+    sortbytheway = False
 
     while True:
         print("\n====== Hilbert's Hotel Menu ======")
@@ -14,7 +15,7 @@ def menu():
         print("4. Sort Rooms")
         print("5. Search Room")
         print("6. Show All Guests")
-        print("7. Export Guest Data to File")  # << เพิ่มบรรทัดนี้
+        print("7. Export Guest Data to File") 
 
         print("00. Exit")
         print("===================================\n")
@@ -50,9 +51,9 @@ def menu():
 
         elif choice == "2":
             try:
-                aircraft_id = int(input("Enter ID of aircrafts : "))
-                barge_id = int(input("Enter ID of barges: "))
-                car_id = int(input("Enter ID of cars per barge: "))
+                aircraft_id = int(input("Enter ID of aircraft : "))
+                barge_id = int(input("Enter ID of barge: "))
+                car_id = int(input("Enter ID of car: "))
 
                 room_number = int(input("Enter room number: "))
                 
@@ -83,7 +84,7 @@ def menu():
             except ValueError:
                 print("Invalid room number!")
 
-        elif choice == "6": ##เอาไว้โชว์ผลก่อน เทสๆ##
+        elif choice == "6":
             hotel.show_all_guests()
             print("Total guests:", hotel.get_total_guests())
 

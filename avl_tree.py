@@ -63,6 +63,33 @@ class AVLTree: ##อันนี้แชทแนะนำมาเอาไว
 
         return root
 
+    def insert2(self, root, guest): ##แทรกแขกใหม่ด้วยการใช้หมายเลขห้อง##
+        if not root:
+            return AVLNode(guest)
+        elif guest.room < root.guest.room:
+            root.left = self.insert(root.left, guest)
+        else:
+            root.right = self.insert(root.right, guest)
+
+        root.height = 1 + max(self.__getHight(root.left), self.__getHight(root.right))
+        balance = self.__getBalance(root)
+
+        if balance > 1 and guest.room < root.left.guest.room:
+            return self.__rotateRight(root)
+        
+        if balance < -1 and guest.room > root.right.guest.room:
+            return self.__rotateLeft(root)
+        
+        if balance > 1 and guest.room > root.left.guest.room:
+            root.left = self.__rotateLeft(root.left)
+            return self.__rotateRight(root)
+        
+        if balance < -1 and guest.room < root.right.guest.room:
+            root.right = self.__rotateRight(root.right)
+            return self.__rotateLeft(root)
+
+        return root
+    
     def inOrder(self, root,listkeep=None): ##เรียงแขกตามหมายเลขห้อง##
         if listkeep is None:
             listkeep = []
