@@ -1,0 +1,8 @@
+Channel	Order	Room
+=============================
+initial_guest	order0	1
+initial_guest	order1	2
+aircraft1_barge1_car1	order0	3
+initial_guest	order3	4
+initial_guest	order4	5
+aircraft1_barge1_car1	order0	6
