@@ -1,17 +1,11 @@
-
+# guest.py
 class Guest:
-    def __init__(self, order, aircraft_id, barge_id, car_id, room=0):
-        self.order = order # guest_num
-        self.aircraft_id = aircraft_id
-        self.barge_id = barge_id
-        self.car_id = car_id
+    def __init__(self, channel_name, channel_order, room=0):
+        self.channel_name = channel_name
+        self.channel_order = channel_order
         self.room = room
 
-    def get_channel_string(self):
-        # ถ้าเป็นแขกเริ่มต้น (ที่เราจะมาร์คด้วย -1) ให้แสดงผลเป็นแขกเริ่มต้น
-        if self.aircraft_id == -1:
-            return f"initial_guest"
-        return f"aircraft{self.aircraft_id}_barge{self.barge_id}_car{self.car_id}"
-
+    # MODIFIED: ปรับปรุงการแสดงผลเป็นรูปแบบคอลัมน์ที่อ่านง่าย
     def __repr__(self):
-        return f"Guest(channel={self.get_channel_string()}, order={self.order}, room={self.room})"
+        # จัดคอลัมน์: Channel (กว้าง 25 ตัวอักษร), Order (5), Room (ที่เหลือ)
+        return f"  {self.channel_name:<25} | Order: {self.channel_order+1:<5} | Room: {self.room}"
