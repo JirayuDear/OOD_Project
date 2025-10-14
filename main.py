@@ -51,9 +51,9 @@ def menu():
 
         elif choice == "2":
             try:
-                aircraft_id = int(input("Enter ID of aircrafts : "))
-                barge_id = int(input("Enter ID of barges: "))
-                car_id = int(input("Enter ID of cars per barge: "))
+                aircraft_id = int(input("Enter ID of aircraft : "))
+                barge_id = int(input("Enter ID of barge: "))
+                car_id = int(input("Enter ID of car: "))
 
                 room_number = int(input("Enter room number: "))
                 
