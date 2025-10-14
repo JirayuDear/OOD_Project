@@ -111,7 +111,3 @@ class HashTable:
             if index == start_index:
                 return False # วนกลับมาที่เดิมแล้วแต่ไม่เจอ
         return False # ไม่เจอ key ที่จะลบ
-
-
-
-

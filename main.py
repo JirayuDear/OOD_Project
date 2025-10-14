@@ -119,7 +119,7 @@ def menu():
         print("4. Sort Rooms")
         print("5. Search Room")
         print("6. Show All Guests")
-        print("7. Export Guest Data to File") 
+        print("7. Export Guest Data to File")
         print("8. Show Memory Usage")
 
         print("00. Exit")
@@ -161,6 +161,7 @@ def menu():
             create_guests_recursive(arrival_data, channel_names, primes, [], manual_guests, current_round)
             
             hotel.add_rooms_manual(manual_guests)
+
         elif choice == "3":
             try:
                 room_number = int(input("Choose room number to delete "))
@@ -189,7 +190,7 @@ def menu():
 
         elif choice == "7":
             hotel.export_guest_data()
-
+        
         elif choice == "8":
             hotel.show_memory_usage()
 

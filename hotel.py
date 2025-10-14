@@ -79,6 +79,7 @@ class Hotel:
             for guest in self.listsort:
                 print(guest, flush=True)
 
+
     @timer
     def search_room(self, room_number):
         guest = self.room_map.search(room_number)
@@ -86,6 +87,7 @@ class Hotel:
             print("No member in this room.")
         else:
             print(guest)
+
 
     @timer
     def get_total_guests(self):
@@ -123,7 +125,6 @@ class Hotel:
             self.__root = self.__tree.insert(self.__root, guest)
             print(f"Guest successfully added to room {guest.room}.")
             self.all_guests_ever.append(guest)
-        self.show_memory_usage()
 
     @timer
     def remove_guest_by_room(self, room_number):
