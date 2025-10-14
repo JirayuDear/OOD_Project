@@ -155,9 +155,21 @@ class AVLTree: ##อันนี้แชทแนะนำมาเอาไว
             print('     ' * level, node.guest)
             self.printTree(node.left, level + 1)
 
-    def writeInOrder(self, node, f):
-        if node:
-            self.writeInOrder(node.left, f)
-            guest = node.guest
-            f.write(f"{guest.get_channel_string()}\torder{guest.order}\t{guest.room}\n")
-            self.writeInOrder(node.right, f)
+    def writeInOrder(self, root, file):
+        
+        if root is not None:
+            self.writeInOrder(root.left, file)
+            guest = root.guest  
+
+            try:
+                    file.write(
+                        f"{guest.arrival_round}\t"
+                        f"{guest.get_channel_string()}\t"
+                        f"{guest.order}\t"
+                        f"{guest.room}\n"
+                    )
+            except Exception as e:
+                
+                file.write(f"[Invalid Guest Node] {e}\n")
+            self.writeInOrder(root.right, file)
+
