@@ -12,6 +12,8 @@ class Hotel:
         self.last_aircraft_id = 0
         self.listsort = []
         self.all_guests_ever = []
+        self.arrival_round_counter = 0 
+        self.used_rooms = set()
  
     @property
     def get_tree(self):
@@ -30,75 +32,32 @@ class Hotel:
             print(f"\n'{func.__name__}' runtime: {end - start:.6f} sec") 
             return result
         return wrapper
-    
-    def cal_room(self, guest_num, cars_id, barge_id, aircraft_id):
-        room_number = (((guest_num+1)**2) * ((cars_id+1)**3) * ((barge_id+1)**5) * ((aircraft_id+1)**7))
-        return room_number
-    
+
     @timer
-    def add_new_guests(self, arrival_data):
-        print(f"\nAdding new guests and starting re-accommodation...")
-        newly_arrived_guests = []
-        for aircraft in arrival_data:
-            aircraft_id = aircraft["aircraft_id"]
-            self.last_aircraft_id = max(self.last_aircraft_id, aircraft_id + 1)
-            for barge in aircraft["barges"]:
-                barge_id = barge["barge_id"]
-                cars_iterable = [(car["car_id"], car["num_people"]) for car in barge["cars"]]
-                for cars_id, count in cars_iterable:
-                    for guest_num in range(count):
-                        guest = Guest(order=guest_num, aircraft_id=aircraft_id, barge_id=barge_id, car_id=cars_id)
-                        newly_arrived_guests.append(guest)
-        self.add_guests_info(newly_arrived_guests)
-        self.show_memory_usage()
+    def add_and_reaccommodate(self, new_guests_list):
+        self.all_guests_ever.extend(new_guests_list)
+        print(f"\nRe-accommodating for ALL {len(self.all_guests_ever)} guests...")
 
-    def add_guests_info(self, new_guests_list, is_initial=False):
-        if is_initial:
-            self.all_guests_ever = new_guests_list
-        else:
-            self.all_guests_ever.extend(new_guests_list)
-
-        print(f"Calculating new rooms for all {len(self.all_guests_ever)} guests...")
-        guests_with_new_rooms = []
         used_rooms = set()
+        self.room_map = HashTable()
+        self.__root = None
 
-        for guest in self.all_guests_ever:
-            a_id, b_id, c_id = 0, 0, 0
-            if guest.aircraft_id == -1:
-                a_id, b_id, c_id = 0, 0, 0
-            else:
-                a_id, b_id, c_id = guest.aircraft_id, guest.barge_id, guest.car_id
+        sorted_guests = sorted(self.all_guests_ever, key=lambda g: g.preferred_room)
 
-            preferred_room = self.cal_room(guest.order, c_id, b_id, a_id)
-            final_room = preferred_room
+        for guest in sorted_guests:
+            final_room = guest.preferred_room
             while final_room in used_rooms:
                 final_room += 1
             
             guest.room = final_room
             used_rooms.add(final_room)
-            guests_with_new_rooms.append(guest)
-            
-        self.__root = None
-        self.room_map = HashTable(size=int(len(self.all_guests_ever) / 0.7) + 16)
-
-        for guest in guests_with_new_rooms:
             self.room_map.insert(guest.room, guest)
             self.__root = self.__tree.insert(self.__root, guest)
-            
-        self.listsort = []
 
-    @timer
-    def add_initial_guest(self, num_initial_guests):
-        initial_guests_list = []
+        self.all_guests_ever = sorted_guests
         
-        for i in range(num_initial_guests):
-            room_num = i + 1 
-            guest = Guest(order=i, aircraft_id=-1, barge_id=-1, car_id=-1, room=room_num)
-            self.room_map.insert(guest.room, guest)
-            self.__root = self.__tree.insert(self.__root, guest)
-            initial_guests_list.append(guest)
-        self.all_guests_ever.extend(initial_guests_list)
-        self.show_memory_usage()
+        self.arrival_round_counter += 1
+        print("Full re-accommodation complete.")
 
 
     @timer
@@ -109,8 +68,11 @@ class Hotel:
         self.listsort = self.__tree.inOrder(self.__root)
 
         print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
+<<<<<<< HEAD
 
         
+=======
+>>>>>>> origin/main
 
     @timer
     def show_all_guests(self):
@@ -139,6 +101,7 @@ class Hotel:
         return len(self.room_map)
     
     @timer
+<<<<<<< HEAD
     def add_rooms_manual(self, room_number, list_channel):
         aircraft_id = list_channel[0]
         barge_id = list_channel[1]
@@ -156,6 +119,39 @@ class Hotel:
 
         self.all_guests_ever.append(new_guest)
         self.show_memory_usage()
+=======
+    def add_rooms_manual(self, guest_list):
+        for guest in guest_list:
+            # ตรวจสอบห้องว่างและจัดการกรณีชนห้อง
+            preferred_room, final_room = self.room_map.insert2(guest.preferred_room, guest)
+            if preferred_room != final_room:
+                print(f"\n--- Room Collision Detected! ---")
+                print(f"Room {preferred_room} is occupied. The next available room is {final_room}.")
+                decision = input(f"Do you want to: (1) Take room {final_room}, (2) Choose another room, or (3) Cancel addition? (1/2/3): ")
+                if decision == "1":
+                    guest.room = final_room
+                elif decision == "2":
+                    try:
+                        new_manual_room = int(input("Enter new room number: "))
+                        guest.room = new_manual_room
+                    except ValueError:
+                        print("Invalid input. Cancelling addition.")
+                        continue
+                elif decision == "3":
+                    print("Room addition cancelled.")
+                    continue
+                else:
+                    print("Invalid choice. Taking the next available room by default.")
+                    guest.room = final_room
+            else:
+                guest.room = final_room
+
+            # เพิ่ม guest ลง room_map และ AVL tree
+            self.room_map._internal_insert2(guest.room, guest)
+            self.__root = self.__tree.insert(self.__root, guest)
+            print(f"Guest successfully added to room {guest.room}.")
+            self.all_guests_ever.append(guest)
+>>>>>>> origin/main
 
     @timer
     def remove_guest_by_room(self, room_number):
@@ -179,7 +175,11 @@ class Hotel:
         self.listsort = []
         
         print(f"Successfully removed guest from room {room_number}.")
+<<<<<<< HEAD
         self.show_memory_usage()
+=======
+
+>>>>>>> origin/main
         return guest_to_remove
     
     @timer
