@@ -155,9 +155,12 @@ class Hotel:
     @timer
     def export_guest_data(self, filename="guest_result.txt"):
         with open(filename, "w", encoding="utf-8") as f:
-            f.write("Channel\tOrder\tRoom\n")
-            f.write("=============================\n")
+            f.write("ArrivalRound\tPath\tOrder\tFinalRoom\n")
+            f.write("============================================================\n")
             self.__tree.writeInOrder(self.__root, f)
+        print(f"Export completed: {filename}")
+
+
 
     
     @staticmethod
