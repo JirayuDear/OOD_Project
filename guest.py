@@ -8,4 +8,4 @@ class Guest:
 
     def __str__(self):
         path_str = ' -> '.join(f"{name} {id}" for name, id in zip(self.channel_names, self.channel_ids))
-        return f"Guest(Path: {path_str}, Order: {self.order}, Pref. Room: {self.preferred_room}, Final Room: {self.room})"
+        return f"Guest(Path: {path_str}, Order: {self.order}, Room number: {self.room})"
