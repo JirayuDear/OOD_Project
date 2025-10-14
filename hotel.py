@@ -163,22 +163,37 @@ class Hotel:
         return len(self.room_map)
     
     @timer
-    def add_rooms_manual(self, room_number, list_channel):
-        aircraft_id = list_channel[0]
-        barge_id = list_channel[1]
-        car_id = list_channel[2]
+    def add_rooms_manual(self, guest_list):
+        for guest in guest_list:
+            # ตรวจสอบห้องว่างและจัดการกรณีชนห้อง
+            preferred_room, final_room = self.room_map.insert2(guest.preferred_room, guest)
+            if preferred_room != final_room:
+                print(f"\n--- Room Collision Detected! ---")
+                print(f"Room {preferred_room} is occupied. The next available room is {final_room}.")
+                decision = input(f"Do you want to: (1) Take room {final_room}, (2) Choose another room, or (3) Cancel addition? (1/2/3): ")
+                if decision == "1":
+                    guest.room = final_room
+                elif decision == "2":
+                    try:
+                        new_manual_room = int(input("Enter new room number: "))
+                        guest.room = new_manual_room
+                    except ValueError:
+                        print("Invalid input. Cancelling addition.")
+                        continue
+                elif decision == "3":
+                    print("Room addition cancelled.")
+                    continue
+                else:
+                    print("Invalid choice. Taking the next available room by default.")
+                    guest.room = final_room
+            else:
+                guest.room = final_room
 
-        
-        new_guest = Guest(0, aircraft_id, barge_id, car_id, room_number)
-        final_room = self.room_map.insert(room_number, new_guest)
-        new_guest = Guest(0, aircraft_id, barge_id, car_id, final_room)
-        self.__root = self.__tree.insert(self.__root, new_guest)
-
-        if room_number != final_room:
-            print(f"The room number cannot be issued.")
-            print(f"Your room is {final_room}")
-
-        self.all_guests_ever.append(new_guest)
+            # เพิ่ม guest ลง room_map และ AVL tree
+            self.room_map._internal_insert2(guest.room, guest)
+            self.__root = self.__tree.insert(self.__root, guest)
+            print(f"Guest successfully added to room {guest.room}.")
+            self.all_guests_ever.append(guest)
         self.show_memory_usage()
 
     @timer
