@@ -12,10 +12,8 @@ class Hotel:
         self.last_aircraft_id = 0
         self.listsort = []
         self.all_guests_ever = []
-        self.arrival_round_counter = 0 
-        self.used_rooms = set()
-
-        
+        self.channel_map = {}         # เพิ่มบรรทัดนี้
+        self.next_channel_id = 1      # เพิ่มบรรทัดนี้
  
     @property
     def get_tree(self):
@@ -35,46 +33,70 @@ class Hotel:
             return result
         return wrapper
     
-    def cal_room(self, guest_num, cars_id, barge_id, aircraft_id):
-        room_number = (((guest_num+1)**2) * ((cars_id+1)**3) * ((barge_id+1)**5) * ((aircraft_id+1)**7))
-        return room_number
+    def cal_room(self, channel_name, channel_order):
+        if channel_name not in self.channel_map:
+            # ใช้จำนวนเฉพาะเพื่อลดโอกาสการชนกันของผลคูณ
+            primes = [101, 103, 107, 109, 113, 127, 131, 137, 139, 149]
+            self.channel_map[channel_name] = primes[(self.next_channel_id -1) % len(primes)] * self.next_channel_id
+            self.next_channel_id += 1
+        
+        channel_base_id = self.channel_map[channel_name]
+        return channel_base_id * 1000 + (channel_order + 1)
     
+    def display_guest_summary(self, message):
+        print(f"\n--- {message} ---")
+        if not self.all_guests_ever:
+            print("The hotel is currently empty.")
+            return
+        
+        print(f"Total guests: {len(self.all_guests_ever)}")
+        
+        # NEW: เพิ่มส่วนหัวตาราง
+        print(f"\n  {'Channel':<25} | {'Order':<7} | Room")
+        print(f"  {'-'*25} | {'-'*7} | {'-'*15}")
+
+        display_list = self.all_guests_ever
+        if len(display_list) > 6:
+            for guest in display_list[:3]:
+                print(guest)
+            print("  ...")
+            for guest in display_list[-3:]:
+                print(guest)
+        else:
+            for guest in display_list:
+                print(guest)
+        print(f"  {'-'*25} | {'-'*7} | {'-'*15}\n")
+
     @timer
     def add_new_guests(self, arrival_data):
         print(f"\nAdding new guests and starting re-accommodation...")
+
+        self.display_guest_summary("State BEFORE new guests arrival")
+
         newly_arrived_guests = []
-        for aircraft in arrival_data:
-            aircraft_id = aircraft["aircraft_id"]
-            self.last_aircraft_id = max(self.last_aircraft_id, aircraft_id + 1)
-            for barge in aircraft["barges"]:
-                barge_id = barge["barge_id"]
-                cars_iterable = [(car["car_id"], car["num_people"]) for car in barge["cars"]]
-                for cars_id, count in cars_iterable:
-                    for guest_num in range(count):
-                        guest = Guest(order=guest_num, aircraft_id=aircraft_id, barge_id=barge_id, car_id=cars_id)
-                        newly_arrived_guests.append(guest)
+        for channel in arrival_data:  # แก้ตรงนี้
+            channel_name = channel['name']
+            count = channel['count']
+            for i in range(count):
+                guest = Guest(channel_name=channel_name, channel_order=i)
+                newly_arrived_guests.append(guest)
+        
         self.add_guests_info(newly_arrived_guests)
+
+        self.display_guest_summary("State AFTER new guests arrival")
         self.show_memory_usage()
 
     def add_guests_info(self, new_guests_list, is_initial=False):
-        if is_initial:
-            self.all_guests_ever = new_guests_list
-        else:
-            self.all_guests_ever.extend(new_guests_list)
+        self.all_guests_ever.extend(new_guests_list)
 
         print(f"Calculating new rooms for all {len(self.all_guests_ever)} guests...")
         guests_with_new_rooms = []
         used_rooms = set()
 
         for guest in self.all_guests_ever:
-            a_id, b_id, c_id = 0, 0, 0
-            if guest.aircraft_id == -1:
-                a_id, b_id, c_id = 0, 0, 0
-            else:
-                a_id, b_id, c_id = guest.aircraft_id, guest.barge_id, guest.car_id
-
-            preferred_room = self.cal_room(guest.order, c_id, b_id, a_id)
+            preferred_room = self.cal_room(guest.channel_name, guest.channel_order)
             final_room = preferred_room
+            # จัดการการชนกันของหมายเลขห้อง (เผื่อสูตรคำนวณชนกัน)
             while final_room in used_rooms:
                 final_room += 1
             
@@ -82,6 +104,7 @@ class Hotel:
             used_rooms.add(final_room)
             guests_with_new_rooms.append(guest)
             
+        # Rebuild data structures
         self.__root = None
         self.room_map = HashTable(size=int(len(self.all_guests_ever) / 0.7) + 16)
 
@@ -93,15 +116,13 @@ class Hotel:
 
     @timer
     def add_initial_guest(self, num_initial_guests):
-        initial_guests_list = []
-        
+        initial_guests = []
         for i in range(num_initial_guests):
-            room_num = i + 1 
-            guest = Guest(order=i, aircraft_id=-1, barge_id=-1, car_id=-1, room=room_num)
-            self.room_map.insert(guest.room, guest)
-            self.__root = self.__tree.insert(self.__root, guest)
-            initial_guests_list.append(guest)
-        self.all_guests_ever.extend(initial_guests_list)
+            guest = Guest(channel_name="Initial Guest", channel_order=i)
+            initial_guests.append(guest)
+        self.add_guests_info(initial_guests)
+        print("\nInitial guests have been accommodated.")
+        self.display_guest_summary("Initial State of the Hotel")
         self.show_memory_usage()
 
     @timer
@@ -142,37 +163,22 @@ class Hotel:
         return len(self.room_map)
     
     @timer
-    def add_rooms_manual(self, guest_list):
-        for guest in guest_list:
-            # ตรวจสอบห้องว่างและจัดการกรณีชนห้อง
-            preferred_room, final_room = self.room_map.insert2(guest.preferred_room, guest)
-            if preferred_room != final_room:
-                print(f"\n--- Room Collision Detected! ---")
-                print(f"Room {preferred_room} is occupied. The next available room is {final_room}.")
-                decision = input(f"Do you want to: (1) Take room {final_room}, (2) Choose another room, or (3) Cancel addition? (1/2/3): ")
-                if decision == "1":
-                    guest.room = final_room
-                elif decision == "2":
-                    try:
-                        new_manual_room = int(input("Enter new room number: "))
-                        guest.room = new_manual_room
-                    except ValueError:
-                        print("Invalid input. Cancelling addition.")
-                        continue
-                elif decision == "3":
-                    print("Room addition cancelled.")
-                    continue
-                else:
-                    print("Invalid choice. Taking the next available room by default.")
-                    guest.room = final_room
-            else:
-                guest.room = final_room
+    def add_rooms_manual(self, room_number, list_channel):
+        aircraft_id = list_channel[0]
+        barge_id = list_channel[1]
+        car_id = list_channel[2]
 
-            # เพิ่ม guest ลง room_map และ AVL tree
-            self.room_map._internal_insert2(guest.room, guest)
-            self.__root = self.__tree.insert(self.__root, guest)
-            print(f"Guest successfully added to room {guest.room}.")
-            self.all_guests_ever.append(guest)
+        
+        new_guest = Guest(0, aircraft_id, barge_id, car_id, room_number)
+        final_room = self.room_map.insert(room_number, new_guest)
+        new_guest = Guest(0, aircraft_id, barge_id, car_id, final_room)
+        self.__root = self.__tree.insert(self.__root, new_guest)
+
+        if room_number != final_room:
+            print(f"The room number cannot be issued.")
+            print(f"Your room is {final_room}")
+
+        self.all_guests_ever.append(new_guest)
         self.show_memory_usage()
 
     @timer
