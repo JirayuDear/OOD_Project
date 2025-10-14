@@ -101,7 +101,6 @@ class Hotel:
         self.all_guests_ever.extend(initial_guests_list)
         self.show_memory_usage()
 
-
     @timer
     def sortbytheway(self):
         
@@ -122,6 +121,8 @@ class Hotel:
             for guest in self.listsort:
                 print(guest, flush=True)
 
+        self.show_memory_usage()
+
     @timer
     def search_room(self, room_number):
         guest = self.room_map.search(room_number)
@@ -130,9 +131,10 @@ class Hotel:
         else:
             print(guest)
 
+        self.show_memory_usage()
 
     @timer
-    def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
+    def get_total_guests(self):
         return len(self.room_map)
     
     @timer
@@ -175,8 +177,6 @@ class Hotel:
     
         print(f"Successfully removed guest from room {room_number}.")
         self.show_memory_usage()
-
-        
 
         return guest_to_remove
     
