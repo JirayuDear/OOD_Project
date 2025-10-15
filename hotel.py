@@ -97,37 +97,79 @@ class Hotel:
     
     @timer
     def add_rooms_manual(self, guest_list):
+    
+    # 1. วนลูปผ่านแขกทุกคนที่มาในชุด Manual นี้
         for guest in guest_list:
             
-            preferred_room, final_room = self.room_map.insert2(guest.preferred_room, guest)
-            if preferred_room != final_room:
-                print(f"\n--- Room Collision Detected! ---")
-                print(f"Room {preferred_room} is occupied. The next available room is {final_room}.")
-                decision = input(f"Do you want to: (1) Take room {final_room}, (2) Choose another room, or (3) Cancel addition? (1/2/3): ")
-                if decision == "1":
-                    guest.room = final_room
-                elif decision == "2":
-                    try:
-                        new_manual_room = int(input("Enter new room number: "))
-                        guest.room = new_manual_room
-                    except ValueError:
-                        print("Invalid input. Cancelling addition.")
-                        continue
-                elif decision == "3":
-                    print("Room addition cancelled.")
-                    continue
-                else:
-                    print("Invalid choice. Taking the next available room by default.")
-                    guest.room = final_room
-            else:
-                guest.room = final_room
-
+            added_successfully = False
             
-            self.room_map._internal_insert2(guest.room, guest)
-            self.__root = self.__tree.insert(self.__root, guest)
-            print(f"Guest successfully added to room {guest.room}.")
-            self.all_guests_ever.append(guest)
+            # 2. วนลูปเพื่อจัดการการเลือกห้องของแขกคนนี้ จนกว่าจะสำเร็จหรือยกเลิก
+            while not added_successfully:
+                
+                # --- A. รับหมายเลขห้องที่ต้องการ ---
+                try:
+                    # แจ้งให้ผู้ใช้ป้อนห้องที่ต้องการสำหรับแขกคนปัจจุบัน
+                    manual_room = int(input(f"\nGuest: {guest}\nEnter desired room number: "))
+                except ValueError:
+                    print("Invalid input. Please enter a valid integer room number. Cancelling addition for this guest.")
+                    break # ยกเลิกแขกคนนี้และไปแขกคนต่อไป
+                    
+                final_room_to_use = -1
+                
+                # --- B. ตรวจสอบการชนกัน ---
+                if self.room_map.search(manual_room) is not None:
+                    
+                    # ห้องชน: ค้นหาห้องว่างถัดไปที่โปรแกรมเสนอ (Next Available Room)
+                    next_room = manual_room + 1
+                    while self.room_map.search(next_room) is not None:
+                        next_room += 1
 
+                    print(f"\n--- Room Collision Detected! ---")
+                    print(f"Room {manual_room} is occupied. The next available room is {next_room}.")
+                    
+                    # ให้ผู้ใช้เลือก 3 ตัวเลือก
+                    decision = input(f"Choose option: (1) Take room {next_room}, (2) Choose another room, or (3) Cancel addition? (1/2/3): ")
+                    
+                    if decision == "1":
+                        # Option 1: รับห้องที่โปรแกรมเสนอ
+                        final_room_to_use = next_room
+                        print(f"Guest will take room {final_room_to_use}.")
+                        
+                    elif decision == "2":
+                        # Option 2: วนกลับไปถามห้องใหม่ (ทำต่อใน While loop)
+                        print("Returning to room selection...")
+                        continue 
+                        
+                    elif decision == "3":
+                        # Option 3: ยกเลิกแขกคนนี้
+                        print("Room addition cancelled for this guest.")
+                        break # ออกจาก While loop และไปแขกคนต่อไป
+                        
+                    else:
+                        print("Invalid choice. Returning to room selection.")
+                        continue 
+                        
+                else:
+                    # ห้องไม่ชน: รับห้องที่ผู้ใช้ป้อน (manual_room)
+                    final_room_to_use = manual_room
+
+                # --- C. ทำการแทรกข้อมูลเมื่อได้ห้องที่ยืนยันแล้ว ---
+                if final_room_to_use != -1:
+                    guest.room = final_room_to_use
+                    
+                    # ใช้ _internal_insert2 เพื่อแทรกเข้า Hash Table
+                    self.room_map._internal_insert2(guest.room, guest) 
+                    
+                    # แทรกเข้า AVL Tree
+                    self.__root = self.__tree.insert(self.__root, guest) 
+                    
+                    print(f"Guest successfully added to room {guest.room}.")
+                    self.all_guests_ever.append(guest)
+                    added_successfully = True # ออกจาก While loop ภายใน
+
+        # 3. แสดงผลการใช้หน่วยความจำ
+        self.show_memory_usage()
+        self.arrival_round_counter += 1
     @timer
     def remove_guest_by_room(self, room_number):
         guest_to_remove = self.room_map.search(room_number)
