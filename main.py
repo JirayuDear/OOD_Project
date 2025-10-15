@@ -27,7 +27,7 @@ def calculate_room_dynamically(guest_order, channel_ids, primes):
         room_number *= ((channel_id + 1) ** prime_exponent)
     return room_number
 
-def create_guests_recursive(data, channel_names, primes, current_ids, guest_list, arrival_round): # CHANGED
+def create_guests_recursive(data, channel_names, primes, current_ids, guest_list, arrival_round,manaul = None): # CHANGED
     if not data: return
     if "num_people" in data[0]:
         for item in data:
@@ -37,14 +37,14 @@ def create_guests_recursive(data, channel_names, primes, current_ids, guest_list
             for i in range(num_people):
                 pref_room = calculate_room_dynamically(i, final_ids, primes)
                 guest = Guest(order=i, channel_ids=final_ids, preferred_room=pref_room, 
-                              channel_names=channel_names, arrival_round=arrival_round)
+                              channel_names=channel_names, arrival_round=arrival_round,manual=manaul)
                 guest_list.append(guest)
         return
 
     for item in data:
         item_id = item["id"]
         new_ids = current_ids + [item_id]
-        create_guests_recursive(item.get("sub_channels", []), channel_names, primes, new_ids, guest_list, arrival_round)
+        create_guests_recursive(item.get("sub_channels", []), channel_names, primes, new_ids, guest_list, arrival_round,manaul)
 
 def prompt_for_arrivals_recursive(channel_names, parent_name=None):
 
@@ -158,7 +158,7 @@ def menu():
             arrival_data = prompt_for_arrivals_recursive(channel_names)
 
             manual_guests = []
-            create_guests_recursive(arrival_data, channel_names, primes, [], manual_guests, current_round)
+            create_guests_recursive(arrival_data, channel_names, primes, [], manual_guests, current_round,"Manual")
             
             hotel.add_rooms_manual(manual_guests)
 
