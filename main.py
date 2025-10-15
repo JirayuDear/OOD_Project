@@ -119,7 +119,8 @@ def menu():
         print("4. Sort Rooms")
         print("5. Search Room")
         print("6. Show All Guests")
-        print("7. Export Guest Data to File") 
+        print("7. Export Guest Data to File")
+        print("8. Show Memory Usage")
 
         print("00. Exit")
         print("===================================\n")
@@ -189,6 +190,9 @@ def menu():
 
         elif choice == "7":
             hotel.export_guest_data()
+        
+        elif choice == "8":
+            hotel.show_memory_usage()
 
         elif choice == "00": 
             print("Exiting program...")

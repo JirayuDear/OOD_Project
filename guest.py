@@ -14,3 +14,11 @@ class Guest:
         # CHANGED: Added arrival_round to the printout
         return (f"Guest(Round: {self.arrival_round}, Path: {path_str}, Order: {self.order}, "
                 f"Room: {self.room})")
+    
+    def get_channel_string(self):
+        
+        if not self.channel_names or not self.channel_ids:
+            return "N/A"
+        return " -> ".join(
+            f"{name} {id_}" for name, id_ in zip(self.channel_names, self.channel_ids)
+        )

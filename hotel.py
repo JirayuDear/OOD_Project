@@ -58,16 +58,16 @@ class Hotel:
         
         self.arrival_round_counter += 1
         print("Full re-accommodation complete.")
-        # self.show_memory_usage() 
+
 
     @timer
     def sortbytheway(self):
         
+            
         print("\nSorting by actual room number (AVL Tree order)...")
         self.listsort = self.__tree.inOrder(self.__root)
 
         print(f"Sort completed. {len(self.listsort)} guests sorted.\n")
-        self.show_memory_usage()
 
     @timer
     def show_all_guests(self):
@@ -81,7 +81,6 @@ class Hotel:
             for guest in self.listsort:
                 print(guest, flush=True)
 
-        self.show_memory_usage()
 
     @timer
     def search_room(self, room_number):
@@ -91,10 +90,9 @@ class Hotel:
         else:
             print(guest)
 
-        self.show_memory_usage()
 
     @timer
-    def get_total_guests(self):
+    def get_total_guests(self): ##อันนี้คืนค่าจำนวนแขกทั้งหมด##
         return len(self.room_map)
     
     @timer
@@ -129,7 +127,6 @@ class Hotel:
             self.__root = self.__tree.insert(self.__root, guest)
             print(f"Guest successfully added to room {guest.room}.")
             self.all_guests_ever.append(guest)
-        self.show_memory_usage()
 
     @timer
     def remove_guest_by_room(self, room_number):
@@ -153,16 +150,17 @@ class Hotel:
         self.listsort = []
         
         print(f"Successfully removed guest from room {room_number}.")
-        self.show_memory_usage()
-
         return guest_to_remove
     
     @timer
     def export_guest_data(self, filename="guest_result.txt"):
         with open(filename, "w", encoding="utf-8") as f:
-            f.write("Channel\tOrder\tRoom\n")
-            f.write("=============================\n")
+            f.write("ArrivalRound\tPath\tOrder\tFinalRoom\n")
+            f.write("============================================================\n")
             self.__tree.writeInOrder(self.__root, f)
+        print(f"Export completed: {filename}")
+
+
 
     
     @staticmethod
