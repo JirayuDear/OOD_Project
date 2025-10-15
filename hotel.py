@@ -100,7 +100,7 @@ class Hotel:
     @timer
     def add_rooms_manual(self, guest_list):
         for guest in guest_list:
-            # ตรวจสอบห้องว่างและจัดการกรณีชนห้อง
+            
             preferred_room, final_room = self.room_map.insert2(guest.preferred_room, guest)
             if preferred_room != final_room:
                 print(f"\n--- Room Collision Detected! ---")
@@ -124,7 +124,7 @@ class Hotel:
             else:
                 guest.room = final_room
 
-            # เพิ่ม guest ลง room_map และ AVL tree
+            
             self.room_map._internal_insert2(guest.room, guest)
             self.__root = self.__tree.insert(self.__root, guest)
             print(f"Guest successfully added to room {guest.room}.")
