@@ -162,12 +162,20 @@ class AVLTree: ##อันนี้แชทแนะนำมาเอาไว
             guest = root.guest  
 
             try:
+                if guest.manual == None:
                     file.write(
                         f"{guest.arrival_round}\t"
                         f"{guest.get_channel_string()}\t"
                         f"{guest.order}\t"
                         f"{guest.room}\n"
                     )
+                elif guest.manual != None:
+                    file.write(
+                        f"{guest.arrival_round}({guest.manual})\t"
+                        f"{guest.get_channel_string()}\t"
+                        f"{guest.order}\t"
+                        f"{guest.room}\n"
+                    )    
             except Exception as e:
                 
                 file.write(f"[Invalid Guest Node] {e}\n")
