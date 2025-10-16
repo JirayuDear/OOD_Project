@@ -167,9 +167,8 @@ class Hotel:
                     self.all_guests_ever.append(guest)
                     added_successfully = True # ออกจาก While loop ภายใน
 
-        # 3. แสดงผลการใช้หน่วยความจำ
-        self.show_memory_usage()
         self.arrival_round_counter += 1
+        
     @timer
     def remove_guest_by_room(self, room_number):
         guest_to_remove = self.room_map.search(room_number)
