@@ -102,15 +102,13 @@ class Hotel:
         for guest in guest_list:
             
             added_successfully = False
-            
-           
             while not added_successfully:
                 
               
                 try:
                     manual_room = int(input(f"\nGuest: {guest}\nEnter desired room number: "))
                     if manual_room <= 0 :
-                        print("Invalid input. Please enter a valid integer room number. Cancelling addition for this guest")
+                        print("Invalid input. Cancelling addition for this guest")
                         break
                 except ValueError:
                     print("Invalid input. Please enter a valid integer room number. Cancelling addition for this guest.")
