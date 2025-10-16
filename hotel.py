@@ -109,6 +109,9 @@ class Hotel:
               
                 try:
                     manual_room = int(input(f"\nGuest: {guest}\nEnter desired room number: "))
+                    if manual_room <= 0 :
+                        print("Invalid input. Please enter a valid integer room number. Cancelling addition for this guest")
+                        break
                 except ValueError:
                     print("Invalid input. Please enter a valid integer room number. Cancelling addition for this guest.")
                     break
