@@ -35,6 +35,7 @@ class Hotel:
 
     @timer
     def add_and_reaccommodate(self, new_guests_list):
+        print(self.all_guests_ever)
         self.all_guests_ever.extend(new_guests_list)
         print(f"\nRe-accommodating for ALL {len(self.all_guests_ever)} guests...")
 
@@ -163,6 +164,10 @@ class Hotel:
         
     @timer
     def remove_guest_by_room(self, room_number):
+        for i in range(len(self.all_guests_ever)-1):
+            if room_number == self.all_guests_ever[i].room:
+                self.all_guests_ever.pop(i)
+                print(self.all_guests_ever)
         guest_to_remove = self.room_map.search(room_number)
 
         if guest_to_remove is None:
