@@ -160,11 +160,7 @@ class Hotel:
                     print(f"Guest successfully added to room {guest.room}.")
                     self.all_guests_ever.append(guest)
                     added_successfully = True # ออกจาก While loop ภายใน
-<<<<<<< HEAD
-
-=======
         
->>>>>>> 1ece96a3b45ce1e0e8304522afe392e0049089cf
         self.arrival_round_counter += 1
         
     @timer
