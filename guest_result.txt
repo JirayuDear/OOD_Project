@@ -1,2 +1,9 @@
-Channel	Order	Room
-=============================
+ArrivalRound	Path	Order	FinalRoom
+============================================================
+0	initial 0	0	1
+1	ship 0 -> car 0	0	2
+2	car 0	0	3
+2	car 0	1	4
+0	initial 1	0	8
+2	car 1	0	9
+1	ship 0 -> car 1	0	32
